@@ -13,7 +13,7 @@ import zipfile
 
 
 ROOT = Path(__file__).resolve().parent
-TEMPLATE_PATH = ROOT / "RH_Collecte_BKO_2026.xlsx"
+TEMPLATE_PATH = Path(r"C:\Users\eklu\Downloads\111\RH\Template\RH_Collecte_Neemba_2026.xlsx")
 OUTPUT_PATH = ROOT / "RH_Collecte_SIMULATION_2026.xlsx"
 PER_FILIALE_DIR = ROOT / "simulation_data"
 SUMMARY_PATH = PER_FILIALE_DIR / "simulation_summary.json"
@@ -593,7 +593,7 @@ def workbook_sheet_paths(file_map: dict[str, bytes]) -> dict[str, str]:
         raise ValueError("Workbook XML is missing sheets.")
     result: dict[str, str] = {}
     for sheet in sheets:
-        result[sheet.attrib["name"]] = "xl/" + rid_to_target[sheet.attrib[qname(DOC_REL_NS, "id")]]
+        result[sheet.attrib["name"]] = rid_to_target[sheet.attrib[qname(DOC_REL_NS, "id")]].lstrip('/')
     return result
 
 
@@ -602,7 +602,8 @@ def table_path_for_sheet(file_map: dict[str, bytes], sheet_path: str) -> str:
     rels_root = ET.fromstring(file_map[rels_path])
     for rel in rels_root.findall(qname(REL_NS, "Relationship")):
         if rel.attrib.get("Type", "").endswith("/table"):
-            return posixpath.normpath(f"{Path(sheet_path).parent.as_posix()}/{rel.attrib['Target']}")
+            target = rel.attrib['Target']
+            return posixpath.normpath(target).lstrip('/')
     raise ValueError(f"No table relationship found for {sheet_path}")
 
 
