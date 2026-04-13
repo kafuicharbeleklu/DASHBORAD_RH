@@ -1,0 +1,98 @@
+table MasseSalarialeMensuelle
+	lineageTag: ec3740d9-33e0-4fd2-a365-34d6a27a1a91
+
+	measure HUBShare =
+			DIVIDE(
+				SUM(MasseSalarialeMensuelle[PayrollHUB]),
+				SUM(MasseSalarialeMensuelle[Payroll]),
+				0
+			)
+		formatString: 0.0%
+		displayFolder: 'HR Performance\Payroll'
+		lineageTag: e066f86d-767e-4a10-b163-d8655ebc71a5
+
+	column FilialeCode
+		dataType: string
+		lineageTag: 8636153e-dd76-4c82-8cc3-758cafa0d661
+		sourceColumn: FilialeCode
+
+	column FilialeName
+		dataType: string
+		lineageTag: 077ac298-76dd-481e-a53f-70b419191d3a
+		sourceColumn: FilialeName
+
+	column MonthStartDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: aacd1831-bc07-4603-b4b6-ddfbc054d271
+		summarizeBy: none
+		sourceColumn: MonthStartDate
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column SourceYear
+		dataType: int64
+		lineageTag: 777a840e-c6bf-4a9f-986d-9a524f04dfc5
+		summarizeBy: none
+		sourceColumn: SourceYear
+
+	column PayrollBudget
+		dataType: double
+		lineageTag: 33e8e870-b331-4cb6-9425-bfea7d460214
+		sourceColumn: PayrollBudget
+
+	column Payroll
+		dataType: double
+		lineageTag: 329b3045-940c-4dad-b015-eba58c3bcec9
+		sourceColumn: Payroll
+
+	column PayrollHUB
+		dataType: double
+		lineageTag: 0156130b-abe3-492b-b778-e755e19bb49b
+		sourceColumn: PayrollHUB
+
+	column OvertimeHours
+		dataType: double
+		lineageTag: 666e0baf-6924-4bc3-a1c2-1e25a02139ac
+		sourceColumn: OvertimeHours
+
+	column OvertimeCost
+		dataType: double
+		lineageTag: a8ed1cdb-52d2-4842-ba0c-c56306c9168c
+		sourceColumn: OvertimeCost
+
+	column LeaveBalance
+		dataType: double
+		lineageTag: a1df5849-9138-433e-a2ee-1aa02c8b2991
+		sourceColumn: LeaveBalance
+
+	column LeaveProvision
+		dataType: double
+		lineageTag: a688b4b2-9f4e-4f8d-b1b3-24af9d91a72b
+		sourceColumn: LeaveProvision
+
+	partition MasseSalarialeMensuelle = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(FolderPathParameter & "\" & SourceWorkbookNameParameter), null, true),
+				    MasseTable = Source{[Item="tbl_MasseSalarialeMensuelle",Kind="Table"]}[Data],
+				    #"FilteredRows" = Table.SelectRows(MasseTable, each let _month = try Text.Trim(Text.From([MonthStartDate])) otherwise "" in _month <> ""),
+				    ToDate = (value as any) as nullable date =>
+				        let
+				            DirectDate = try Date.From(value) otherwise null,
+				            Serial = if DirectDate <> null then null else try Number.From(value) otherwise null
+				        in
+				            if DirectDate <> null then DirectDate else if Serial <> null then Date.AddDays(#date(1899, 12, 30), Serial) else null,
+				    #"ConvertDates" = Table.TransformColumns(#"FilteredRows", {{"MonthStartDate", ToDate, type date}}),
+				    TextColumns = {"FilialeCode", "FilialeName"},
+				    #"TrimmedText" = Table.TransformColumns(#"ConvertDates", List.Transform(TextColumns, each {_, (v) => if v = null then null else Text.Trim(Text.From(v)), type text})),
+				    #"ChangedTypes" = Table.TransformColumns(#"TrimmedText", {{"SourceYear", each try Int64.From(_) otherwise null, Int64.Type}, {"PayrollBudget", each try Number.From(_) otherwise null, type number}, {"Payroll", each try Number.From(_) otherwise null, type number}, {"PayrollHUB", each try Number.From(_) otherwise null, type number}, {"OvertimeHours", each try Number.From(_) otherwise null, type number}, {"OvertimeCost", each try Number.From(_) otherwise null, type number}, {"LeaveBalance", each try Number.From(_) otherwise null, type number}, {"LeaveProvision", each try Number.From(_) otherwise null, type number}}),
+				    #"SelectOutput" = Table.SelectColumns(#"ChangedTypes", {"FilialeCode", "FilialeName", "MonthStartDate", "SourceYear", "PayrollBudget", "Payroll", "PayrollHUB", "OvertimeHours", "OvertimeCost", "LeaveBalance", "LeaveProvision"})
+				in
+				    #"SelectOutput"
+
+	annotation PBI_ResultType = Table
+

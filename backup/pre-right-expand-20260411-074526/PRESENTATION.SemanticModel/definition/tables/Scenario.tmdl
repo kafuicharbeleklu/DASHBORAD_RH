@@ -1,0 +1,21 @@
+table Scenario
+	lineageTag: 05c23855-dba7-4af9-a9ff-c8e2297d7b01
+
+	column Scenario
+		dataType: string
+		lineageTag: 05c23855-dba7-4af9-a9ff-c8e2297d7b02
+		summarizeBy: none
+		sourceColumn: Scenario
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Scenario = m
+		mode: import
+		source =
+				let
+				    Source = #table(type table [Scenario = text], {{"Réalisé"}, {"Budget"}})
+				in
+				    Source
+
+	annotation PBI_ResultType = Table
+

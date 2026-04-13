@@ -1,0 +1,153 @@
+table Absence
+	lineageTag: b21b09b9-e76d-4319-b938-1ead84c4dd47
+
+	measure 'Absence Rate' =
+			DIVIDE(
+				[Absence Hours],
+				[Headcount] * 8 * 21,
+				0
+			)
+		formatString: 0.0%
+		displayFolder: 'HR Performance\Absence'
+		lineageTag: 3e31c83c-ba60-42ad-ab39-f15609be783b
+
+	measure 'Absence Rate Latest' =
+			VAR _lastDate = CALCULATE(MAX(Absence[DATE]), ALL(Absence))
+			RETURN CALCULATE([Absence Rate], Absence[DATE] = _lastDate)
+		formatString: 0.0%
+		displayFolder: 'HR Performance\Absence'
+		lineageTag: d369c464-4492-452f-8c8b-00977551e6c7
+
+	measure 'Absence Hours' = SUM(Absence[AbsenceHours])
+		formatString: 0
+		displayFolder: 'HR Performance\Absence'
+		lineageTag: 5fba9a7a-b402-43f4-99ab-b4ac65f5589a
+
+	measure 'Absence Hours Latest' =
+			VAR _lastDate = CALCULATE(MAX(Absence[DATE]), ALL(Absence))
+			RETURN CALCULATE([Absence Hours], Absence[DATE] = _lastDate)
+		formatString: 0
+		displayFolder: 'HR Performance\Absence'
+		lineageTag: bfcdc5fc-baa7-4d2f-80eb-4bdde7123ab2
+
+	measure 'Leave Days Taken' = SUM(Absence[LeaveDaysTaken])
+		formatString: 0.0
+		displayFolder: 'HR Performance\Absence'
+		lineageTag: db15e180-6cd2-4d34-b396-eebbc5ec9492
+
+	measure 'Leave Days Taken Latest' =
+			VAR _lastDate = CALCULATE(MAX(Absence[DATE]), ALL(Absence))
+			RETURN CALCULATE([Leave Days Taken], Absence[DATE] = _lastDate)
+		formatString: 0.0
+		displayFolder: 'HR Performance\Absence'
+		lineageTag: 8af51763-4246-4b07-8fa3-446b2edf8efc
+
+	measure 'Leave Days Opening' = SUM(Absence[OpeningLeaveDays])
+		formatString: 0.0
+		displayFolder: 'HR Performance\Absence'
+		lineageTag: 5fba9a7a-b402-43f4-99ab-b4ac65f5589b
+
+	measure 'Leave Days Opening Latest' =
+			VAR _lastDate = CALCULATE(MAX(Absence[DATE]), ALL(Absence))
+			RETURN CALCULATE([Leave Days Opening], Absence[DATE] = _lastDate)
+		formatString: 0.0
+		displayFolder: 'HR Performance\Absence'
+		lineageTag: 5fba9a7a-b402-43f4-99ab-b4ac65f5589c
+
+	measure 'Leave Days Closing' = SUM(Absence[ClosingLeaveDays])
+		formatString: 0.0
+		displayFolder: 'HR Performance\Absence'
+		lineageTag: 5fba9a7a-b402-43f4-99ab-b4ac65f5589d
+
+	measure 'Leave Days Closing Latest' =
+			VAR _lastDate = CALCULATE(MAX(Absence[DATE]), ALL(Absence))
+			RETURN CALCULATE([Leave Days Closing], Absence[DATE] = _lastDate)
+		formatString: 0.0
+		displayFolder: 'HR Performance\Absence'
+		lineageTag: 5fba9a7a-b402-43f4-99ab-b4ac65f5589e
+
+	column DATE
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 3d773332-2c3d-476f-8f0a-4e58c49ef4d8
+		summarizeBy: none
+		sourceColumn: DATE
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column LeaveDaysTaken
+		dataType: double
+		lineageTag: c40e0eb5-a9bc-45f8-bddc-a396e4dbdfd0
+		summarizeBy: sum
+		sourceColumn: LeaveDaysTaken
+
+		annotation SummarizationSetBy = Automatic
+
+	column AbsenceHours
+		dataType: int64
+		formatString: 0
+		lineageTag: a80ec9bd-7097-4fc3-851f-1ad4c0d7787e
+		summarizeBy: sum
+		sourceColumn: AbsenceHours
+
+		annotation SummarizationSetBy = Automatic
+
+	column AbsenceRate
+		dataType: double
+		lineageTag: 3e76b205-0267-4e3f-a531-c7058b324c33
+		summarizeBy: sum
+		sourceColumn: AbsenceRate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column OpeningLeaveDays
+		dataType: double
+		lineageTag: 5fba9a7a-b402-43f4-99ab-b4ac65f5589f
+		summarizeBy: sum
+		sourceColumn: OpeningLeaveDays
+
+		annotation SummarizationSetBy = Automatic
+
+	column LeaveDaysAccrued
+		dataType: double
+		lineageTag: 5fba9a7a-b402-43f4-99ab-b4ac65f558a0
+		summarizeBy: sum
+		sourceColumn: LeaveDaysAccrued
+
+		annotation SummarizationSetBy = Automatic
+
+	column ClosingLeaveDays
+		dataType: double
+		lineageTag: 5fba9a7a-b402-43f4-99ab-b4ac65f558a1
+		summarizeBy: sum
+		sourceColumn: ClosingLeaveDays
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Absence = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(FolderPathParameter & "\" & SourceWorkbookNameParameter), null, true),
+				    Absence_Table = Source{[Item="tbl_AbsenceMensuelle",Kind="Table"]}[Data],
+				    #"FilteredRows" = Table.SelectRows(Absence_Table, each let _month = try Text.Trim(Text.From([MonthStartDate])) otherwise "" in _month <> ""),
+				    ToDate = (value as any) as nullable date =>
+				        let
+				            _directDate = try Date.From(value) otherwise null,
+				            _serial = if _directDate <> null then null else try Number.From(value) otherwise null
+				        in
+				            if _directDate <> null then _directDate else if _serial <> null then Date.AddDays(#date(1899, 12, 30), _serial) else null,
+				    #"ConvertDate" = Table.TransformColumns(#"FilteredRows", {{"MonthStartDate", ToDate, type date}}),
+				    #"SelectColumns" = if Table.HasColumns(#"ConvertDate", {"AbsenceRate"}) then Table.SelectColumns(#"ConvertDate", {"MonthStartDate", "OpeningLeaveDays", "LeaveDaysTaken", "LeaveDaysAccrued", "ClosingLeaveDays", "AbsenceHours", "AbsenceRate"}) else Table.SelectColumns(#"ConvertDate", {"MonthStartDate", "OpeningLeaveDays", "LeaveDaysTaken", "LeaveDaysAccrued", "ClosingLeaveDays", "AbsenceHours"}),
+				    #"AddAbsenceRate" = if Table.HasColumns(#"SelectColumns", {"AbsenceRate"}) then #"SelectColumns" else Table.AddColumn(#"SelectColumns", "AbsenceRate", each null, type number),
+				    #"RenamedColumns" = Table.RenameColumns(#"AddAbsenceRate", {{"MonthStartDate", "DATE"}}),
+				    #"ChangedType" = Table.TransformColumns(#"RenamedColumns", {{"OpeningLeaveDays", each try Number.From(_) otherwise null, type number}, {"LeaveDaysTaken", each try Number.From(_) otherwise null, type number}, {"LeaveDaysAccrued", each try Number.From(_) otherwise null, type number}, {"ClosingLeaveDays", each try Number.From(_) otherwise null, type number}, {"AbsenceHours", each try Int64.From(_) otherwise null, Int64.Type}, {"AbsenceRate", each try Number.From(_) otherwise null, type number}})
+				in
+				    #"ChangedType"
+
+	annotation PBI_ResultType = Table
+

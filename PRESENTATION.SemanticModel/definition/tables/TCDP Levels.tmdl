@@ -1,0 +1,80 @@
+table 'TCDP Levels'
+	lineageTag: e7eb91a1-c4d1-40ab-82a7-5e487fb63201
+
+	measure 'TCDP Level Headcount' = SUM('TCDP Levels'[Headcount])
+		formatString: 0
+		displayFolder: 'TCDP\Levels'
+		lineageTag: e7eb91a1-c4d1-40ab-82a7-5e487fb63202
+
+	measure 'TCDP Level Headcount Latest' =
+			VAR _lastMonth = MAXX(ALL('TCDP Levels'), 'TCDP Levels'[MonthOrder])
+			RETURN CALCULATE([TCDP Level Headcount], 'TCDP Levels'[MonthOrder] = _lastMonth)
+		formatString: 0
+		displayFolder: 'TCDP\Levels'
+		lineageTag: e7eb91a1-c4d1-40ab-82a7-5e487fb63203
+
+	column Mois
+		dataType: string
+		lineageTag: e7eb91a1-c4d1-40ab-82a7-5e487fb63204
+		summarizeBy: none
+		sourceColumn: Mois
+
+		annotation SummarizationSetBy = Automatic
+
+	column MonthOrder
+		dataType: int64
+		formatString: 0
+		lineageTag: e7eb91a1-c4d1-40ab-82a7-5e487fb63205
+		summarizeBy: sum
+		sourceColumn: MonthOrder
+
+		annotation SummarizationSetBy = Automatic
+
+	column Level
+		dataType: string
+		lineageTag: e7eb91a1-c4d1-40ab-82a7-5e487fb63206
+		summarizeBy: none
+		sourceColumn: Level
+
+		annotation SummarizationSetBy = Automatic
+
+	column Headcount
+		dataType: int64
+		formatString: 0
+		lineageTag: e7eb91a1-c4d1-40ab-82a7-5e487fb63207
+		summarizeBy: sum
+		sourceColumn: Headcount
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'TCDP Levels' = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(FolderPathParameter & "\" & SourceWorkbookNameParameter), null, true),
+				    TCDP_Table = Source{[Item="tbl_TCDP_Headcount",Kind="Table"]}[Data],
+				    #"FilteredRows" = Table.SelectRows(TCDP_Table, each let _month = try Text.Trim(Text.From([MonthStartDate])) otherwise "" in _month <> ""),
+				    ToDate = (value as any) as nullable date =>
+				        let
+				            _directDate = try Date.From(value) otherwise null,
+				            _serial = if _directDate <> null then null else try Number.From(value) otherwise null
+				        in
+				            if _directDate <> null then _directDate else if _serial <> null then Date.AddDays(#date(1899, 12, 30), _serial) else null,
+				    LevelMap = [L1 = "Level 1", L2A = "Level 2A", L2B = "Level 2B", L2C = "Level 2C", L3A = "Level 3A", L3B = "Level 3B", L3C = "Level 3C", L4 = "Level 4", L5 = "Level 5"],
+				    MapValue = (value as any, mapping as record) as nullable text =>
+				        let
+				            _key = if value = null then null else Text.Trim(Text.From(value))
+				        in
+				            if _key = null or _key = "" then null else try Record.Field(mapping, _key) otherwise _key,
+				    #"ConvertDate" = Table.TransformColumns(#"FilteredRows", {{"MonthStartDate", ToDate, type date}}),
+				    #"SelectColumns" = Table.SelectColumns(#"ConvertDate", {"MonthStartDate", "TCDPLevelCode", "Headcount"}),
+				    #"RenamedColumns" = Table.RenameColumns(#"SelectColumns", {{"MonthStartDate", "DATE"}, {"TCDPLevelCode", "Level"}}),
+				    #"MappedLevels" = Table.TransformColumns(#"RenamedColumns", {{"Level", each MapValue(_, LevelMap), type text}, {"Headcount", each try Int64.From(_) otherwise null, Int64.Type}}),
+				    #"AddMonthLabel" = Table.AddColumn(#"MappedLevels", "Mois", each Date.ToText([DATE], "MMM-yy", "fr-FR"), type text),
+				    #"AddMonthOrder" = Table.AddColumn(#"AddMonthLabel", "MonthOrder", each Date.Year([DATE]) * 100 + Date.Month([DATE]), Int64.Type),
+				    #"SelectOutput" = Table.SelectColumns(#"AddMonthOrder", {"Mois", "MonthOrder", "Level", "Headcount"})
+				in
+				    #"SelectOutput"
+
+	annotation PBI_ResultType = Table
+

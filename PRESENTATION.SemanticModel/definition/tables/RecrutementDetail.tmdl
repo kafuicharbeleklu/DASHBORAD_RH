@@ -1,0 +1,174 @@
+table RecrutementDetail
+	lineageTag: fb2ee846-b021-4c7c-957c-5c8935790bac
+
+	column FilialeCode
+		dataType: string
+		lineageTag: 4479e51a-ba21-4421-859a-37f58202a623
+		summarizeBy: none
+		sourceColumn: FilialeCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column FilialeName
+		dataType: string
+		lineageTag: e077b2cf-124c-42c8-959f-941f4db9c6b0
+		summarizeBy: none
+		sourceColumn: FilialeName
+
+		annotation SummarizationSetBy = Automatic
+
+	column RecruitmentRequestID
+		dataType: string
+		lineageTag: 7750b601-f590-43ac-9f4e-283af02966b2
+		summarizeBy: none
+		sourceColumn: RecruitmentRequestID
+
+		annotation SummarizationSetBy = Automatic
+
+	column MonthStartDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 604829dd-742c-45d9-a879-ab3978a8a0de
+		summarizeBy: none
+		sourceColumn: MonthStartDate
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column SourceYear
+		dataType: int64
+		lineageTag: d3f79e3b-2cb3-4a5b-a8c6-1f73876815e0
+		summarizeBy: sum
+		sourceColumn: SourceYear
+
+		annotation SummarizationSetBy = Automatic
+
+	column PlannedRecruitmentDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: a3ebb035-5d4a-4e93-879e-47e6a59418f7
+		summarizeBy: none
+		sourceColumn: PlannedRecruitmentDate
+
+		variation Variation
+			isDefault
+			relationship: 698ba696-b1f3-47ab-b850-b0e88f18b195
+			defaultHierarchy: LocalDateTable_e7a0aa49-eb0f-4dcf-b385-3b6905cf571c.'Hiérarchie de dates'
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column MotifRecrutementCode
+		dataType: string
+		lineageTag: 8dce6699-18d0-42f0-8ef8-5f3e8ecd5292
+		summarizeBy: none
+		sourceColumn: MotifRecrutementCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column PositionTitle
+		dataType: string
+		lineageTag: 2b4b544d-1bbd-4531-af23-ef071dd34ec4
+		summarizeBy: none
+		sourceColumn: PositionTitle
+
+		annotation SummarizationSetBy = Automatic
+
+	column PositionCount
+		dataType: int64
+		lineageTag: c8671714-7918-4b5a-862f-1946c39e1ed8
+		summarizeBy: sum
+		sourceColumn: PositionCount
+
+		annotation SummarizationSetBy = Automatic
+
+	column DepartmentServiceLOB
+		dataType: string
+		lineageTag: 30af8736-be57-4207-a83d-d7c0b6754d2a
+		summarizeBy: none
+		sourceColumn: DepartmentServiceLOB
+
+		annotation SummarizationSetBy = Automatic
+
+	column EffectiveEntryDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: d3116ac6-5e61-4b73-932f-04a801a02cca
+		summarizeBy: none
+		sourceColumn: EffectiveEntryDate
+
+		variation Variation
+			isDefault
+			relationship: 53168e7c-99f1-40db-bea7-58420b65a46b
+			defaultHierarchy: LocalDateTable_e630f364-b61f-4a34-99a8-c7d6b42cdabc.'Hiérarchie de dates'
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column TypeContratCode
+		dataType: string
+		lineageTag: 3dde7b75-f675-4fe7-9d63-a2e826c027e4
+		summarizeBy: none
+		sourceColumn: TypeContratCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column ContractDurationMonths
+		dataType: int64
+		lineageTag: 24f6473e-d090-4e04-b23b-298cc559dc99
+		summarizeBy: sum
+		sourceColumn: ContractDurationMonths
+
+		annotation SummarizationSetBy = Automatic
+
+	column PriorYearCarryOverStatus
+		dataType: string
+		lineageTag: f9dd7376-0a70-496d-b310-0f6fd0eb3bd6
+		summarizeBy: none
+		sourceColumn: PriorYearCarryOverStatus
+
+		annotation SummarizationSetBy = Automatic
+
+	column EstimatedAnnualCostBudget
+		dataType: double
+		lineageTag: bfcd1f61-264d-4dc7-a4c6-e35f4af4de97
+		summarizeBy: sum
+		sourceColumn: EstimatedAnnualCostBudget
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsOutOfBudget
+		dataType: string
+		lineageTag: 30b362d2-0e55-4cbe-a118-a207a13e46f4
+		summarizeBy: none
+		sourceColumn: IsOutOfBudget
+
+		annotation SummarizationSetBy = Automatic
+
+	partition RecrutementDetail = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(FolderPathParameter & "\" & SourceWorkbookNameParameter), null, true),
+				    DetailTable = Source{[Item="tbl_RecrutementDetail",Kind="Table"]}[Data],
+				    #"FilteredRows" = Table.SelectRows(DetailTable, each let _requestId = try Text.Trim(Text.From([RecruitmentRequestID])) otherwise "" in _requestId <> ""),
+				    ToDate = (value as any) as nullable date =>
+				        let
+				            DirectDate = try Date.From(value) otherwise null,
+				            Serial = if DirectDate <> null then null else try Number.From(value) otherwise null
+				        in
+				            if DirectDate <> null then DirectDate else if Serial <> null then Date.AddDays(#date(1899, 12, 30), Serial) else null,
+				    #"RenamedColumns" = Table.RenameColumns(#"FilteredRows", {{"RecruitmentReasonCode", "MotifRecrutementCode"}}),
+				    #"ConvertDates" = Table.TransformColumns(#"RenamedColumns", {{"MonthStartDate", ToDate, type date}, {"PlannedRecruitmentDate", ToDate, type date}, {"EffectiveEntryDate", ToDate, type date}}),
+				    TextColumns = {"FilialeCode", "FilialeName", "RecruitmentRequestID", "MotifRecrutementCode", "PositionTitle", "DepartmentServiceLOB", "TypeContratCode", "PriorYearCarryOverStatus", "IsOutOfBudget"},
+				    #"TrimmedText" = Table.TransformColumns(#"ConvertDates", List.Transform(TextColumns, each {_, (v) => if v = null then null else Text.Trim(Text.From(v)), type text})),
+				    #"ChangedTypes" = Table.TransformColumns(#"TrimmedText", {{"SourceYear", each try Int64.From(_) otherwise null, Int64.Type}, {"PositionCount", each try Int64.From(_) otherwise null, Int64.Type}, {"ContractDurationMonths", each try Int64.From(_) otherwise null, Int64.Type}, {"EstimatedAnnualCostBudget", each try Number.From(_) otherwise null, type number}}),
+				    #"SelectOutput" = Table.SelectColumns(#"ChangedTypes", {"FilialeCode", "FilialeName", "RecruitmentRequestID", "MonthStartDate", "SourceYear", "PlannedRecruitmentDate", "MotifRecrutementCode", "PositionTitle", "PositionCount", "DepartmentServiceLOB", "EffectiveEntryDate", "TypeContratCode", "ContractDurationMonths", "PriorYearCarryOverStatus", "EstimatedAnnualCostBudget", "IsOutOfBudget"})
+				in
+				    #"SelectOutput"
+
+	annotation PBI_ResultType = Table
+

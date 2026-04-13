@@ -1,0 +1,135 @@
+table TCDP_Sorties
+	lineageTag: 1abf3752-1d28-4183-906d-5ebb73c7ebc0
+
+	column FilialeCode
+		dataType: string
+		lineageTag: 90b2f264-16f9-4963-a338-f776518eaa4c
+		summarizeBy: none
+		sourceColumn: FilialeCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column FilialeName
+		dataType: string
+		lineageTag: 3ff0c562-044c-4fa4-9809-dbb4b83f88c7
+		summarizeBy: none
+		sourceColumn: FilialeName
+
+		annotation SummarizationSetBy = Automatic
+
+	column EventDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 9f44f32b-c513-45ba-ad23-b61001b0dc1b
+		summarizeBy: none
+		sourceColumn: EventDate
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column MonthStartDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: a07ec90f-c6e3-4d96-be8f-ea77a253614b
+		summarizeBy: none
+		sourceColumn: MonthStartDate
+
+		variation Variation
+			isDefault
+			relationship: 24c6fa14-93a4-4cd6-8089-359402dee689
+			defaultHierarchy: LocalDateTable_263dc6f0-efd3-470e-9958-01114640daab.'Hiérarchie de dates'
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column SourceYear
+		dataType: int64
+		lineageTag: a511b310-302e-480f-b8d8-0f397a7f2ef5
+		summarizeBy: sum
+		sourceColumn: SourceYear
+
+		annotation SummarizationSetBy = Automatic
+
+	column Matricule
+		dataType: string
+		lineageTag: fd1f3aa1-95f3-4db3-a08b-dcc7f91e0dfd
+		summarizeBy: none
+		sourceColumn: Matricule
+
+		annotation SummarizationSetBy = Automatic
+
+	column EmployeeKey
+		dataType: string
+		lineageTag: b6bddcb0-c44c-445c-8ede-2cbd9727515c
+		summarizeBy: none
+		sourceColumn: EmployeeKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column UserID
+		dataType: int64
+		lineageTag: 5ed84aba-f09d-4794-97b6-5d78ed9328ed
+		summarizeBy: count
+		sourceColumn: UserID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Nom
+		dataType: string
+		lineageTag: f4c9454f-162e-4b70-b4dc-5981de42f7c7
+		summarizeBy: none
+		sourceColumn: Nom
+
+		annotation SummarizationSetBy = Automatic
+
+	column Prenom
+		dataType: string
+		lineageTag: c708597f-b598-43b3-9d00-9c31a6f88c80
+		summarizeBy: none
+		sourceColumn: Prenom
+
+		annotation SummarizationSetBy = Automatic
+
+	column TCDPLevelCode
+		dataType: string
+		lineageTag: ac96ef1b-5874-424a-82c8-bc7cef8f7c36
+		summarizeBy: none
+		sourceColumn: TCDPLevelCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column TCDPExitReasonCode
+		dataType: string
+		lineageTag: f11466ed-0d46-4553-a864-b5b9d08f3b7a
+		summarizeBy: none
+		sourceColumn: TCDPExitReasonCode
+
+		annotation SummarizationSetBy = Automatic
+
+	partition TCDP_Sorties = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(FolderPathParameter & "\" & SourceWorkbookNameParameter), null, true),
+				    TCDPTable = Source{[Item="tbl_TCDP_Sorties",Kind="Table"]}[Data],
+				    #"FilteredRows" = Table.SelectRows(TCDPTable, each let _userId = try Text.Trim(Text.From([UserID])) otherwise "" in _userId <> ""),
+				    #"EnsureMatricule" = if Table.HasColumns(#"FilteredRows", {"Matricule"}) then #"FilteredRows" else Table.AddColumn(#"FilteredRows", "Matricule", each null, type text),
+				    ToDate = (value as any) as nullable date =>
+				        let
+				            DirectDate = try Date.From(value) otherwise null,
+				            Serial = if DirectDate <> null then null else try Number.From(value) otherwise null
+				        in
+				            if DirectDate <> null then DirectDate else if Serial <> null then Date.AddDays(#date(1899, 12, 30), Serial) else null,
+				    #"ConvertDates" = Table.TransformColumns(#"EnsureMatricule", {{"EventDate", ToDate, type date}, {"MonthStartDate", ToDate, type date}}),
+				    TextColumns = {"FilialeCode", "FilialeName", "Matricule", "Nom", "Prenom", "TCDPLevelCode", "TCDPExitReasonCode"},
+				    #"TrimmedText" = Table.TransformColumns(#"ConvertDates", List.Transform(TextColumns, each {_, (v) => if v = null then null else Text.Trim(Text.From(v)), type text})),
+				    #"ChangedTypes" = Table.TransformColumns(#"TrimmedText", {{"SourceYear", each try Int64.From(_) otherwise null, Int64.Type}, {"UserID", each try Int64.From(_) otherwise null, Int64.Type}}),
+				    #"AddEmployeeKey" = Table.AddColumn(#"ChangedTypes", "EmployeeKey", each if [FilialeCode] = null or [Matricule] = null or [Matricule] = "" then null else [FilialeCode] & "_" & [Matricule], type text),
+				    #"SelectOutput" = Table.SelectColumns(#"AddEmployeeKey", {"FilialeCode", "FilialeName", "EventDate", "MonthStartDate", "SourceYear", "Matricule", "EmployeeKey", "UserID", "Nom", "Prenom", "TCDPLevelCode", "TCDPExitReasonCode"})
+				in
+				    #"SelectOutput"
+
+	annotation PBI_ResultType = Table
+

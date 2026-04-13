@@ -1,0 +1,141 @@
+table Recrutement
+	lineageTag: 904189d1-694c-4b8d-a91f-bad8a2aeed1f
+
+	measure 'Recruitments Count' = SUM(Recrutement[Recruitments])
+		formatString: 0
+		displayFolder: 'HR Performance\Recruitment'
+		lineageTag: db986fad-7b80-441b-8d60-5e3e89675526
+
+	measure 'Recruitments Count Latest' =
+			VAR _lastDate = CALCULATE(MAX(Recrutement[DATE]), ALL(Recrutement))
+			RETURN CALCULATE([Recruitments Count], Recrutement[DATE] = _lastDate)
+		formatString: 0
+		displayFolder: 'HR Performance\Recruitment'
+		lineageTag: 8a53e9c1-4328-4123-b424-9481115a8573
+
+	measure 'Recruitment Budget Used' = SUM(Recrutement[BudgetUsed])
+		formatString: #,0
+		displayFolder: 'HR Performance\Recruitment'
+		lineageTag: eeba9fe5-4d1c-4b4d-90eb-073061900fae
+
+	measure 'Recruitment Budget Used Latest' =
+			VAR _lastDate = CALCULATE(MAX(Recrutement[DATE]), ALL(Recrutement))
+			RETURN CALCULATE([Recruitment Budget Used], Recrutement[DATE] = _lastDate)
+		formatString: #,0
+		displayFolder: 'HR Performance\Recruitment'
+		lineageTag: 03fac29e-766c-4e72-83cb-c350c7c04c77
+
+	measure 'Recruitments Budget Count' = SUM(Recrutement[RecruitmentsBudget])
+		formatString: 0
+		displayFolder: 'HR Performance\Recruitment'
+		lineageTag: db986fad-7b80-441b-8d60-5e3e89675527
+
+	measure 'Recruitments Budget Count Latest' =
+			VAR _lastDate = CALCULATE(MAX(Recrutement[DATE]), ALL(Recrutement))
+			RETURN CALCULATE([Recruitments Budget Count], Recrutement[DATE] = _lastDate)
+		formatString: 0
+		displayFolder: 'HR Performance\Recruitment'
+		lineageTag: db986fad-7b80-441b-8d60-5e3e89675528
+
+	measure 'Recruitment Budget' = SUM(Recrutement[RecruitmentBudget])
+		formatString: #,0
+		displayFolder: 'HR Performance\Recruitment'
+		lineageTag: db986fad-7b80-441b-8d60-5e3e89675529
+
+	measure 'Recruitment Budget Latest' =
+			VAR _lastDate = CALCULATE(MAX(Recrutement[DATE]), ALL(Recrutement))
+			RETURN CALCULATE([Recruitment Budget], Recrutement[DATE] = _lastDate)
+		formatString: #,0
+		displayFolder: 'HR Performance\Recruitment'
+		lineageTag: db986fad-7b80-441b-8d60-5e3e89675530
+
+	column DATE
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 86c4bfbe-c7f0-45e2-a469-b472c5692fbf
+		summarizeBy: none
+		sourceColumn: DATE
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Recruitments
+		dataType: int64
+		formatString: 0
+		lineageTag: 52fc52c5-d983-48e7-b07b-569e746e5dba
+		summarizeBy: sum
+		sourceColumn: Recruitments
+
+		annotation SummarizationSetBy = Automatic
+
+	column BudgetUsed
+		dataType: double
+		lineageTag: 710e8676-26d9-447c-9be5-ea342e8833cf
+		summarizeBy: sum
+		sourceColumn: BudgetUsed
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column RecruitmentsBudget
+		dataType: int64
+		formatString: 0
+		lineageTag: db986fad-7b80-441b-8d60-5e3e89675531
+		summarizeBy: sum
+		sourceColumn: RecruitmentsBudget
+
+		annotation SummarizationSetBy = Automatic
+
+	column RecruitmentsOutOfBudget
+		dataType: int64
+		formatString: 0
+		lineageTag: db986fad-7b80-441b-8d60-5e3e89675532
+		summarizeBy: sum
+		sourceColumn: RecruitmentsOutOfBudget
+
+		annotation SummarizationSetBy = Automatic
+
+	column RecruitmentBudget
+		dataType: double
+		lineageTag: db986fad-7b80-441b-8d60-5e3e89675533
+		summarizeBy: sum
+		sourceColumn: RecruitmentBudget
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column OutOfBudgetCost
+		dataType: double
+		lineageTag: db986fad-7b80-441b-8d60-5e3e89675534
+		summarizeBy: sum
+		sourceColumn: OutOfBudgetCost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition Recrutement = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(FolderPathParameter & "\" & SourceWorkbookNameParameter), null, true),
+				    Recrutement_Table = Source{[Item="tbl_RecrutementMensuel",Kind="Table"]}[Data],
+				    #"FilteredRows" = Table.SelectRows(Recrutement_Table, each let _month = try Text.Trim(Text.From([MonthStartDate])) otherwise "" in _month <> ""),
+				    ToDate = (value as any) as nullable date =>
+				        let
+				            _directDate = try Date.From(value) otherwise null,
+				            _serial = if _directDate <> null then null else try Number.From(value) otherwise null
+				        in
+				            if _directDate <> null then _directDate else if _serial <> null then Date.AddDays(#date(1899, 12, 30), _serial) else null,
+				    #"ConvertDate" = Table.TransformColumns(#"FilteredRows", {{"MonthStartDate", ToDate, type date}}),
+				    #"SelectColumns" = Table.SelectColumns(#"ConvertDate", {"MonthStartDate", "Recruitments", "RecruitmentsBudget", "RecruitmentsOutOfBudget", "RecruitmentBudget", "BudgetUsed", "OutOfBudgetCost"}),
+				    #"RenamedColumns" = Table.RenameColumns(#"SelectColumns", {{"MonthStartDate", "DATE"}}),
+				    #"ChangedType" = Table.TransformColumns(#"RenamedColumns", {{"Recruitments", each try Int64.From(_) otherwise null, Int64.Type}, {"RecruitmentsBudget", each try Int64.From(_) otherwise null, Int64.Type}, {"RecruitmentsOutOfBudget", each try Int64.From(_) otherwise null, Int64.Type}, {"RecruitmentBudget", each try Number.From(_) otherwise null, type number}, {"BudgetUsed", each try Number.From(_) otherwise null, type number}, {"OutOfBudgetCost", each try Number.From(_) otherwise null, type number}})
+				in
+				    #"ChangedType"
+
+	annotation PBI_ResultType = Table
+

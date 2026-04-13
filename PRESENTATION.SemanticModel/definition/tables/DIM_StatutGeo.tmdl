@@ -1,0 +1,29 @@
+table DIM_StatutGeo
+	lineageTag: e25c9859-513a-40fb-9fe6-7de804a0f889
+
+	column REF_StatutGeo
+		dataType: string
+		lineageTag: b769d17c-a9b1-4d46-9b4d-9518b72c9d9a
+		sourceColumn: REF_StatutGeo
+
+	column Label
+		dataType: string
+		lineageTag: 41a33b2d-cf26-4b37-9864-493274a1c733
+		sourceColumn: Label
+
+	partition DIM_StatutGeo = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(FolderPathParameter & "\" & SourceWorkbookNameParameter), null, true),
+				    RefTable = Source{[Item="tbl_REF_StatutGeo",Kind="Table"]}[Data],
+				    #"ChangedType" = Table.TransformColumnTypes(RefTable, {{"REF_StatutGeo", type text}, {"Label", type text}}),
+				    #"TrimmedText" = Table.TransformColumns(#"ChangedType", {{"REF_StatutGeo", each if _ = null then null else Text.Trim(_), type text}, {"Label", each if _ = null then null else Text.Trim(_), type text}}),
+				    #"FilteredRows" = Table.SelectRows(#"TrimmedText", each [REF_StatutGeo] <> null and [REF_StatutGeo] <> ""),
+				    #"DistinctRows" = Table.Distinct(#"FilteredRows"),
+				    #"SortedRows" = Table.Sort(#"DistinctRows", {{"Label", Order.Ascending}})
+				in
+				    #"SortedRows"
+
+	annotation PBI_ResultType = Table
+

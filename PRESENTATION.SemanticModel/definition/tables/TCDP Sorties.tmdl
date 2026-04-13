@@ -1,0 +1,143 @@
+table 'TCDP Sorties'
+	lineageTag: 954af3ff-1318-4b98-8c25-245a910ca101
+
+	measure 'TCDP Leaves Count' = COUNTROWS('TCDP Sorties')
+		formatString: 0
+		displayFolder: 'TCDP\Attrition'
+		lineageTag: 954af3ff-1318-4b98-8c25-245a910ca102
+
+	measure 'TCDP Voluntary Leaves' =
+			CALCULATE(
+				[TCDP Leaves Count],
+				'TCDP Sorties'[LeaveType] = "Voluntary"
+			)
+		formatString: 0
+		displayFolder: 'TCDP\Attrition'
+		lineageTag: 954af3ff-1318-4b98-8c25-245a910ca103
+
+	measure 'TCDP Voluntary Leaves %' = DIVIDE([TCDP Voluntary Leaves], [TCDP Leaves Count])
+		formatString: 0.0%
+		displayFolder: 'TCDP\Attrition'
+		lineageTag: 954af3ff-1318-4b98-8c25-245a910ca104
+
+	measure 'TCDP Leaves Level 3C' =
+			CALCULATE(
+				[TCDP Leaves Count],
+				'TCDP Sorties'[Level] = "Level 3C"
+			)
+		formatString: 0
+		displayFolder: 'TCDP\Attrition'
+		lineageTag: 954af3ff-1318-4b98-8c25-245a910ca105
+
+	measure 'TCDP Leaves Level 4' =
+			CALCULATE(
+				[TCDP Leaves Count],
+				'TCDP Sorties'[Level] = "Level 4"
+			)
+		formatString: 0
+		displayFolder: 'TCDP\Attrition'
+		lineageTag: 954af3ff-1318-4b98-8c25-245a910ca106
+
+	measure 'TCDP Leaves Level 3C & 4' = [TCDP Leaves Level 3C] + [TCDP Leaves Level 4]
+		formatString: 0
+		displayFolder: 'TCDP\Attrition'
+		lineageTag: 954af3ff-1318-4b98-8c25-245a910ca10f
+
+	column SortieUserID
+		dataType: string
+		lineageTag: 954af3ff-1318-4b98-8c25-245a910ca107
+		summarizeBy: none
+		sourceColumn: SortieUserID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Nom
+		dataType: string
+		lineageTag: 954af3ff-1318-4b98-8c25-245a910ca108
+		summarizeBy: none
+		sourceColumn: Nom
+
+		annotation SummarizationSetBy = Automatic
+
+	column Prenoms
+		dataType: string
+		lineageTag: 954af3ff-1318-4b98-8c25-245a910ca109
+		summarizeBy: none
+		sourceColumn: Prenoms
+
+		annotation SummarizationSetBy = Automatic
+
+	column Level
+		dataType: string
+		lineageTag: 954af3ff-1318-4b98-8c25-245a910ca10a
+		summarizeBy: none
+		sourceColumn: Level
+
+		annotation SummarizationSetBy = Automatic
+
+	column Mois
+		dataType: string
+		lineageTag: 954af3ff-1318-4b98-8c25-245a910ca10b
+		summarizeBy: none
+		sourceColumn: Mois
+
+		annotation SummarizationSetBy = Automatic
+
+	column MonthOrder
+		dataType: int64
+		formatString: 0
+		lineageTag: 954af3ff-1318-4b98-8c25-245a910ca10c
+		summarizeBy: sum
+		sourceColumn: MonthOrder
+
+		annotation SummarizationSetBy = Automatic
+
+	column Motif
+		dataType: string
+		lineageTag: 954af3ff-1318-4b98-8c25-245a910ca10d
+		summarizeBy: none
+		sourceColumn: Motif
+
+		annotation SummarizationSetBy = Automatic
+
+	column LeaveType
+		dataType: string
+		lineageTag: 954af3ff-1318-4b98-8c25-245a910ca10e
+		summarizeBy: none
+		sourceColumn: LeaveType
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'TCDP Sorties' = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(FolderPathParameter & "\" & SourceWorkbookNameParameter), null, true),
+				    TCDP_Table = Source{[Item="tbl_TCDP_Sorties",Kind="Table"]}[Data],
+				    #"FilteredRows" = Table.SelectRows(TCDP_Table, each let _userId = try Text.Trim(Text.From([UserID])) otherwise "" in _userId <> ""),
+				    ToDate = (value as any) as nullable date =>
+				        let
+				            _directDate = try Date.From(value) otherwise null,
+				            _serial = if _directDate <> null then null else try Number.From(value) otherwise null
+				        in
+				            if _directDate <> null then _directDate else if _serial <> null then Date.AddDays(#date(1899, 12, 30), _serial) else null,
+				    LevelMap = [L1 = "Level 1", L2A = "Level 2A", L2B = "Level 2B", L2C = "Level 2C", L3A = "Level 3A", L3B = "Level 3B", L3C = "Level 3C", L4 = "Level 4", L5 = "Level 5"],
+				    ExitReasonMap = [DEMISSION = "Demission", ABANDON = "Abandon", FIN_PROGRAMME = "Fin de programme", LICENCIEMENT = "Licenciement", RETRAITE = "Retraite"],
+				    MapValue = (value as any, mapping as record) as nullable text =>
+				        let
+				            _key = if value = null then null else Text.Trim(Text.From(value))
+				        in
+				            if _key = null or _key = "" then null else try Record.Field(mapping, _key) otherwise _key,
+				    #"ConvertDates" = Table.TransformColumns(#"FilteredRows", {{"EventDate", ToDate, type date}, {"MonthStartDate", ToDate, type date}}),
+				    #"SelectColumns" = Table.SelectColumns(#"ConvertDates", {"UserID", "Nom", "Prenom", "TCDPLevelCode", "MonthStartDate", "TCDPExitReasonCode"}),
+				    #"RenamedColumns" = Table.RenameColumns(#"SelectColumns", {{"UserID", "SortieUserID"}, {"Prenom", "Prenoms"}, {"TCDPLevelCode", "Level"}, {"TCDPExitReasonCode", "Motif"}}),
+				    #"MappedValues" = Table.TransformColumns(#"RenamedColumns", {{"SortieUserID", each if _ = null then null else Text.Trim(Text.From(_)), type text}, {"Nom", each if _ = null then null else Text.Trim(Text.From(_)), type text}, {"Prenoms", each if _ = null then null else Text.Trim(Text.From(_)), type text}, {"Level", each MapValue(_, LevelMap), type text}, {"Motif", each MapValue(_, ExitReasonMap), type text}}),
+				    #"AddMonthLabel" = Table.AddColumn(#"MappedValues", "Mois", each Date.ToText([MonthStartDate], "MMM-yy", "fr-FR"), type text),
+				    #"AddMonthOrder" = Table.AddColumn(#"AddMonthLabel", "MonthOrder", each Date.Year([MonthStartDate]) * 100 + Date.Month([MonthStartDate]), Int64.Type),
+				    #"AddLeaveType" = Table.AddColumn(#"AddMonthOrder", "LeaveType", each let _motif = Text.Lower(if [Motif] = null then "" else Text.From([Motif])), _isVoluntary = Text.Contains(_motif, "demission") or Text.Contains(_motif, "demission") or Text.Contains(_motif, "abandon") in if _isVoluntary then "Voluntary" else "Other", type text),
+				    #"SelectOutput" = Table.SelectColumns(#"AddLeaveType", {"SortieUserID", "Nom", "Prenoms", "Level", "Mois", "MonthOrder", "Motif", "LeaveType"})
+				in
+				    #"SelectOutput"
+
+	annotation PBI_ResultType = Table
+

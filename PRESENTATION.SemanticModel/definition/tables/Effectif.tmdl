@@ -1,0 +1,607 @@
+table Effectif
+	lineageTag: ca1b18b6-ab16-4968-bef1-3d20c5188104
+
+	measure 'Headcount Active' =
+			VAR LatestSnapshot =
+				CALCULATE(
+					MAX(Effectif[SnapshotDate]),
+					REMOVEFILTERS(Effectif[SnapshotDate])
+				)
+			RETURN
+				COALESCE(
+					CALCULATE(
+						SUM(Effectif[_EffectifsActifs]),
+						FILTER(
+							ALL(Effectif[SnapshotDate]),
+							Effectif[SnapshotDate] = LatestSnapshot
+						)
+					),
+					0
+				)
+		formatString: 0
+		displayFolder: 'Overview\Workforce'
+		lineageTag: 18d1db09-2294-4421-b628-c9b139e283df
+
+	measure Headcount = [Headcount Active]
+		formatString: 0
+		displayFolder: 'Overview\Workforce'
+		lineageTag: f72dc16b-f3ad-4be4-a111-52363740f944
+
+	measure 'Map Headcount Benin' =
+			CALCULATE(
+				[Headcount],
+				REMOVEFILTERS(DIM_Filiale),
+				DIM_Filiale[FilialeCode] = "COO"
+			)
+		formatString: 0
+		displayFolder: 'Map\Effectif'
+		lineageTag: 71bc57d3-80cb-4fbe-94a1-1ea69d0a4dc1
+
+	measure 'Map Headcount Burkina Faso' =
+			CALCULATE(
+				[Headcount],
+				REMOVEFILTERS(DIM_Filiale),
+				DIM_Filiale[FilialeCode] = "OUA"
+			)
+		formatString: 0
+		displayFolder: 'Map\Effectif'
+		lineageTag: 77b0cb29-7dfc-4200-a0d2-7bc9edc7ca2f
+
+	measure 'Map Headcount Cote dIvoire' =
+			CALCULATE(
+				[Headcount],
+				REMOVEFILTERS(DIM_Filiale),
+				DIM_Filiale[FilialeCode] = "ABJ"
+			)
+		formatString: 0
+		displayFolder: 'Map\Effectif'
+		lineageTag: f9474b63-d59f-4fd1-9911-aeb423725f52
+
+	measure 'Map Headcount Gambia' =
+			CALCULATE(
+				[Headcount],
+				REMOVEFILTERS(DIM_Filiale),
+				DIM_Filiale[FilialeCode] = "BJL"
+			)
+		formatString: 0
+		displayFolder: 'Map\Effectif'
+		lineageTag: 856268b5-208c-4b42-9ba9-7b89525fa3f1
+
+	measure 'Map Headcount Guinea' =
+			CALCULATE(
+				[Headcount],
+				REMOVEFILTERS(DIM_Filiale),
+				DIM_Filiale[FilialeCode] = "CKY"
+			)
+		formatString: 0
+		displayFolder: 'Map\Effectif'
+		lineageTag: d6ea736e-8030-4b8c-9660-8c760724af63
+
+	measure 'Map Headcount Guinea Bissau' =
+			CALCULATE(
+				[Headcount],
+				REMOVEFILTERS(DIM_Filiale),
+				DIM_Filiale[FilialeCode] = "OXB"
+			)
+		formatString: 0
+		displayFolder: 'Map\Effectif'
+		lineageTag: 6efb8301-5f71-4d4b-a9d6-3bdb00c315ec
+
+	measure 'Map Headcount Mali' =
+			CALCULATE(
+				[Headcount],
+				REMOVEFILTERS(DIM_Filiale),
+				DIM_Filiale[FilialeCode] = "BKO"
+			)
+		formatString: 0
+		displayFolder: 'Map\Effectif'
+		lineageTag: afc40324-0860-4264-ae70-5da8f53be7d7
+
+	measure 'Map Headcount Mauritania' =
+			CALCULATE(
+				[Headcount],
+				REMOVEFILTERS(DIM_Filiale),
+				DIM_Filiale[FilialeCode] = "NKC"
+			)
+		formatString: 0
+		displayFolder: 'Map\Effectif'
+		lineageTag: ae424752-1d85-474f-b0ad-b8df9e997d29
+
+	measure 'Map Headcount Niger' =
+			CALCULATE(
+				[Headcount],
+				REMOVEFILTERS(DIM_Filiale),
+				DIM_Filiale[FilialeCode] = "NIM"
+			)
+		formatString: 0
+		displayFolder: 'Map\Effectif'
+		lineageTag: c21e3747-ceec-4d77-bfb2-d83de853ad6e
+
+	measure 'Map Headcount Senegal' =
+			CALCULATE(
+				[Headcount],
+				REMOVEFILTERS(DIM_Filiale),
+				DIM_Filiale[FilialeCode] = "DKR"
+			)
+		formatString: 0
+		displayFolder: 'Map\Effectif'
+		lineageTag: 986c7167-1db8-4599-a14d-b046cce9dc7c
+
+	measure 'Map Headcount Togo' =
+			CALCULATE(
+				[Headcount],
+				REMOVEFILTERS(DIM_Filiale),
+				DIM_Filiale[FilialeCode] = "LFW"
+			)
+		formatString: 0
+		displayFolder: 'Map\Effectif'
+		lineageTag: e7c7d02d-ad1a-42db-a93f-31bdb3c86b2b
+
+	measure 'Average Age' =
+			VAR LatestSnapshot =
+				CALCULATE(
+					MAX(Effectif[SnapshotDate]),
+					REMOVEFILTERS(Effectif[SnapshotDate])
+				)
+			VAR TodayDate = TODAY()
+			VAR Population =
+				CALCULATETABLE(
+					FILTER(
+						Effectif,
+						NOT ISBLANK(Effectif[EmployeeKey])
+							&& NOT ISBLANK(Effectif[DateNaissance])
+							&& Effectif[DateNaissance] >= DATE(1900, 1, 1)
+							&& Effectif[DateNaissance] <= TodayDate
+					),
+					FILTER(
+						ALL(Effectif[SnapshotDate]),
+						Effectif[SnapshotDate] = LatestSnapshot
+					)
+				)
+			RETURN
+				AVERAGEX(
+					Population,
+					VAR BirthDate = Effectif[DateNaissance]
+					VAR AnniversaryDay =
+						MIN(
+							DAY(BirthDate),
+							DAY(EOMONTH(DATE(YEAR(TodayDate), MONTH(BirthDate), 1), 0))
+						)
+					VAR Anniversary = DATE(YEAR(TodayDate), MONTH(BirthDate), AnniversaryDay)
+					VAR Years = YEAR(TodayDate) - YEAR(BirthDate)
+					RETURN Years - IF(Anniversary > TodayDate, 1, 0)
+				)
+		formatString: 0.0" ans"
+		displayFolder: 'Overview\Population'
+		lineageTag: 6fa2c570-960c-4440-87bd-903faf75c972
+
+	measure 'Women Active' =
+			CALCULATE(
+				[Headcount],
+				KEEPFILTERS(Effectif[SexeCode] = "F")
+			)
+		formatString: 0
+		displayFolder: 'Overview\Workforce'
+		lineageTag: 6da1c4b3-fbfc-49c2-bbc3-3dffd2afbd18
+
+	measure 'Diversity Rate' = DIVIDE([Women Active], [Headcount])
+		formatString: 0.0%
+		displayFolder: 'Overview\Workforce'
+		lineageTag: 6917c714-1ff7-496a-a035-9c196e9b9463
+
+	measure 'Average Seniority' =
+			VAR LatestSnapshot =
+				CALCULATE(
+					MAX(Effectif[SnapshotDate]),
+					REMOVEFILTERS(Effectif[SnapshotDate])
+				)
+			VAR TodayDate = TODAY()
+			VAR Population =
+				CALCULATETABLE(
+					FILTER(
+						Effectif,
+						VAR EntryDate = COALESCE(Effectif[DateEntree], Effectif[DateEmbauche])
+						RETURN
+							NOT ISBLANK(Effectif[EmployeeKey])
+								&& NOT ISBLANK(EntryDate)
+								&& EntryDate >= DATE(1900, 1, 1)
+								&& EntryDate <= TodayDate
+					),
+					FILTER(
+						ALL(Effectif[SnapshotDate]),
+						Effectif[SnapshotDate] = LatestSnapshot
+					)
+				)
+			RETURN
+				AVERAGEX(
+					Population,
+					VAR EntryDate = COALESCE(Effectif[DateEntree], Effectif[DateEmbauche])
+					VAR AnniversaryDay =
+						MIN(
+							DAY(EntryDate),
+							DAY(EOMONTH(DATE(YEAR(TodayDate), MONTH(EntryDate), 1), 0))
+						)
+					VAR Anniversary = DATE(YEAR(TodayDate), MONTH(EntryDate), AnniversaryDay)
+					VAR Years = YEAR(TodayDate) - YEAR(EntryDate)
+					RETURN Years - IF(Anniversary > TodayDate, 1, 0)
+				)
+		formatString: 0.0" ans"
+		displayFolder: 'Overview\Population'
+		lineageTag: bf3dbfdc-1926-4bc1-914a-7557fbc07ce2
+
+	measure 'Departures Current Year' =
+			VAR LatestSnapshot =
+				CALCULATE(
+					MAX(Effectif[SnapshotDate]),
+					REMOVEFILTERS(Effectif[SnapshotDate])
+				)
+			VAR ReportYear =
+				COALESCE(
+					IF(NOT ISBLANK(LatestSnapshot), YEAR(LatestSnapshot)),
+					CALCULATE(MAX(Departs[SourceYear]), REMOVEFILTERS(Departs[SourceYear])),
+					YEAR(TODAY())
+				)
+			RETURN
+				COALESCE(
+					CALCULATE(
+						[Departures Count],
+						FILTER(
+							ALL(Departs[EventDate], Departs[DateDepart], Departs[MonthStartDate], Departs[SourceYear]),
+							VAR DepartureDate = COALESCE(Departs[DateDepart], Departs[EventDate])
+							VAR DepartureYear = IF(NOT ISBLANK(DepartureDate), YEAR(DepartureDate), Departs[SourceYear])
+							RETURN DepartureYear = ReportYear
+						)
+					),
+					0
+				)
+		formatString: 0
+		displayFolder: 'Overview\Attrition'
+		lineageTag: bea7da1c-d9c1-42c8-836e-28b375bdea3a
+
+	measure 'Mobility Current Year' =
+			VAR LatestSnapshot =
+				CALCULATE(
+					MAX(Effectif[SnapshotDate]),
+					REMOVEFILTERS(Effectif[SnapshotDate])
+				)
+			VAR ReportYear =
+				COALESCE(
+					IF(NOT ISBLANK(LatestSnapshot), YEAR(LatestSnapshot)),
+					CALCULATE(MAX(Departs[SourceYear]), REMOVEFILTERS(Departs[SourceYear])),
+					YEAR(TODAY())
+				)
+			RETURN
+				COALESCE(
+					CALCULATE(
+						[Departures Count],
+						FILTER(
+							ALL(Departs[EventDate], Departs[DateDepart], Departs[MonthStartDate], Departs[SourceYear], Departs[MotifDepartCode], Departs[PaysMobilite]),
+							VAR DepartureDate = COALESCE(Departs[DateDepart], Departs[EventDate])
+							VAR DepartureYear = IF(NOT ISBLANK(DepartureDate), YEAR(DepartureDate), Departs[SourceYear])
+							VAR ReasonCode = UPPER(TRIM(COALESCE(Departs[MotifDepartCode], "")))
+							VAR MobilityCountry = TRIM(COALESCE(Departs[PaysMobilite], ""))
+							RETURN
+								DepartureYear = ReportYear
+									&& (
+										ReasonCode = "MOBILITE"
+										|| ReasonCode = "MOBILITY"
+										|| ReasonCode = "MUTATION"
+										|| LEN(MobilityCountry) > 0
+									)
+						)
+					),
+					0
+				)
+		formatString: 0
+		displayFolder: 'Overview\Attrition'
+		lineageTag: 236622bd-6e1e-43ba-aa39-c6ae20c0d11b
+
+	measure 'Turnover Current Year' = DIVIDE([Departures Current Year], [Headcount])
+		formatString: 0.0%
+		displayFolder: 'Overview\Attrition'
+		lineageTag: 00fd4ea1-e63b-4412-a35e-ddb38c1ea067
+
+	column FilialeCode
+		dataType: string
+		lineageTag: 7d9f8c8d-2a01-4218-8b91-9689ff1685b6
+		summarizeBy: none
+		sourceColumn: FilialeCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column FilialeName
+		dataType: string
+		lineageTag: 52f01026-418d-4da9-96ce-ecaf3784a37c
+		summarizeBy: none
+		sourceColumn: FilialeName
+
+		annotation SummarizationSetBy = Automatic
+
+	column SnapshotDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: ebba5e12-bf0e-4f1c-b08e-a70b168a282b
+		summarizeBy: none
+		sourceColumn: SnapshotDate
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column SourceYear
+		dataType: int64
+		lineageTag: 95f3a514-f9df-4d33-85a9-7287ece703eb
+		summarizeBy: sum
+		sourceColumn: SourceYear
+
+		annotation SummarizationSetBy = Automatic
+
+	column Matricule
+		dataType: string
+		lineageTag: 53244c5c-37e8-48c2-80fe-6d1929974573
+		summarizeBy: none
+		sourceColumn: Matricule
+
+		annotation SummarizationSetBy = Automatic
+
+	column EmployeeKey
+		dataType: string
+		lineageTag: 463dbc73-8037-4fe7-9b9d-5f8a3fe2c1bc
+		summarizeBy: none
+		sourceColumn: EmployeeKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column UserID
+		dataType: int64
+		lineageTag: 9b8b5939-10dd-4ca5-8fda-78ace74e4b7c
+		summarizeBy: count
+		sourceColumn: UserID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Nom
+		dataType: string
+		lineageTag: 833a12c9-bf63-49a6-aa24-9f3993ed3a4b
+		summarizeBy: none
+		sourceColumn: Nom
+
+		annotation SummarizationSetBy = Automatic
+
+	column Prenom
+		dataType: string
+		lineageTag: dd5746c9-0521-4920-b57b-7bf2550a893d
+		summarizeBy: none
+		sourceColumn: Prenom
+
+		annotation SummarizationSetBy = Automatic
+
+	column SexeCode
+		dataType: string
+		lineageTag: ec39a289-1ecd-4540-b00b-46870c44204a
+		summarizeBy: none
+		sourceColumn: SexeCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column DateNaissance
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 144aadc7-4789-4c9d-b96f-94f1c902cdfd
+		summarizeBy: none
+		sourceColumn: DateNaissance
+
+		variation Variation
+			isDefault
+			relationship: 5f112eb6-f0a4-4e54-bd4f-f8a035cbde48
+			defaultHierarchy: LocalDateTable_da5f79ea-62f9-4e18-b5b3-c6ac330894b9.'Hiérarchie de dates'
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column DateEmbauche
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: c9079d4b-0c93-4a11-8e1c-a6b35eff9e39
+		summarizeBy: none
+		sourceColumn: DateEmbauche
+
+		variation Variation
+			isDefault
+			relationship: d9ad2b12-ea74-4f63-b825-847f4c26734f
+			defaultHierarchy: LocalDateTable_ebe640fd-74f1-40d4-8980-8dfac4795011.'Hiérarchie de dates'
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column DateEntree
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: d312ddef-147c-4df6-a677-0a58527691e7
+		summarizeBy: none
+		sourceColumn: DateEntree
+
+		variation Variation
+			isDefault
+			relationship: dce3d803-27d9-420c-87fe-f2d337f3915b
+			defaultHierarchy: LocalDateTable_9c46787b-f0e0-4974-a3a3-1b4f1a2d4c23.'Hiérarchie de dates'
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column Direction
+		dataType: string
+		lineageTag: 39d24e59-877d-4af2-992d-cfcc3511f210
+		summarizeBy: none
+		sourceColumn: Direction
+
+		annotation SummarizationSetBy = Automatic
+
+	column Departement
+		dataType: string
+		lineageTag: 1dc8b883-331c-49c1-88d0-f994eeeaf3b5
+		summarizeBy: none
+		sourceColumn: Departement
+
+		annotation SummarizationSetBy = Automatic
+
+	column Service
+		dataType: string
+		lineageTag: 2c6066d3-00ef-4b40-9895-c9b3e8bde6c2
+		summarizeBy: none
+		sourceColumn: Service
+
+		annotation SummarizationSetBy = Automatic
+
+	column PosteHarmonise
+		dataType: string
+		lineageTag: a0221255-13a8-4bac-bba5-13a5e34238d9
+		summarizeBy: none
+		sourceColumn: PosteHarmonise
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fonction
+		dataType: string
+		lineageTag: 902b2e54-4d08-4529-ab5b-52045cee4bed
+		summarizeBy: none
+		sourceColumn: Fonction
+
+		annotation SummarizationSetBy = Automatic
+
+	column CodeAnalytique
+		dataType: string
+		lineageTag: 8c65b8d9-c6b9-499d-bbcf-257b7ac7e325
+		summarizeBy: none
+		sourceColumn: CodeAnalytique
+
+		annotation SummarizationSetBy = Automatic
+
+	column AffectationAnalytique
+		dataType: string
+		lineageTag: a77748ee-fda0-41e6-8973-90b1017bfb47
+		summarizeBy: none
+		sourceColumn: AffectationAnalytique
+
+		annotation SummarizationSetBy = Automatic
+
+	column CategorieConventionnelleCode
+		dataType: string
+		lineageTag: 2bff1c28-b5e3-41d7-a32a-1ab0f8d4d284
+		summarizeBy: none
+		sourceColumn: CategorieConventionnelleCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column TypeContratCode
+		dataType: string
+		lineageTag: 6dbc859a-39af-4e31-b769-9d69a0e7f49c
+		summarizeBy: none
+		sourceColumn: TypeContratCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column DateFinContrat
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 77d1d989-33a0-408d-aeb6-3ec9859f08fd
+		summarizeBy: none
+		sourceColumn: DateFinContrat
+
+		variation Variation
+			isDefault
+			relationship: 8759aceb-0c36-4b03-857f-6eb455f7d6e2
+			defaultHierarchy: LocalDateTable_b12d2768-b4e6-420c-823a-c3683da3aae5.'Hiérarchie de dates'
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column StatutGeoCode
+		dataType: string
+		lineageTag: 8bc503a6-39c8-41f2-9235-cf16b4e43896
+		summarizeBy: none
+		sourceColumn: StatutGeoCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column NationaliteCode
+		dataType: string
+		lineageTag: a8586a91-07e8-4eba-b6d4-b905d7778ff7
+		summarizeBy: none
+		sourceColumn: NationaliteCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column NiveauTCDPCode
+		dataType: string
+		lineageTag: 8ce57956-7935-4f35-a6f2-16f9e31a5469
+		summarizeBy: none
+		sourceColumn: NiveauTCDPCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column _EffectifsActifs
+		dataType: int64
+		lineageTag: c0caca03-7c8b-408a-8093-29eb0772416e
+		summarizeBy: sum
+		sourceColumn: _EffectifsActifs
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Seniority Band'
+		dataType: string
+		lineageTag: 9674bfa5-9088-4bbc-a2fc-bff09ac7d20d
+		summarizeBy: none
+		sourceColumn: Seniority Band
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Effectif = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(FolderPathParameter & "\" & SourceWorkbookNameParameter), null, true),
+				    EffectifTable = Source{[Item="tbl_Effectif",Kind="Table"]}[Data],
+				    #"FilteredRows" = Table.SelectRows(EffectifTable, each let _userId = try Text.Trim(Text.From([UserID])) otherwise "" in _userId <> ""),
+				    RefreshDate = Date.From(DateTime.FixedLocalNow()),
+				    ToDate = (value as any) as nullable date =>
+				        let
+				            DirectDate = try Date.From(value) otherwise null,
+				            Serial = if DirectDate <> null then null else try Number.From(value) otherwise null
+				        in
+				            if DirectDate <> null then DirectDate else if Serial <> null then Date.AddDays(#date(1899, 12, 30), Serial) else null,
+				    FullYearsBetween = (startDate as nullable date, endDate as nullable date) as nullable number =>
+				        if startDate = null or endDate = null then
+				            null
+				        else
+				            let
+				                Years = Date.Year(endDate) - Date.Year(startDate),
+				                Anniversary = Date.AddYears(startDate, Years)
+				            in
+				                Years - (if Anniversary > endDate then 1 else 0),
+				    SeniorityBand = (years as nullable number) as nullable text =>
+				        if years = null then null else
+				        if years < 5 then "0-4" else
+				        if years < 10 then "05-09" else
+				        if years < 15 then "10-14" else
+				        if years < 20 then "15-19" else
+				        if years < 25 then "20-24" else
+				        if years < 30 then "25-29" else
+				        "30 et plus",
+				    #"ConvertDates" = Table.TransformColumns(#"FilteredRows", {{"SnapshotDate", ToDate, type date}, {"DateNaissance", ToDate, type date}, {"DateEmbauche", ToDate, type date}, {"DateEntree", ToDate, type date}, {"DateFinContrat", ToDate, type date}}),
+				    TextColumns = {"FilialeCode", "FilialeName", "Matricule", "Nom", "Prenom", "SexeCode", "Direction", "Departement", "Service", "PosteHarmonise", "Fonction", "CodeAnalytique", "AffectationAnalytique", "CategorieConventionnelleCode", "TypeContratCode", "StatutGeoCode", "NationaliteCode", "NiveauTCDPCode"},
+				    #"TrimmedText" = Table.TransformColumns(#"ConvertDates", List.Transform(TextColumns, each {_, (v) => if v = null then null else Text.Trim(Text.From(v)), type text})),
+				    #"ChangedNumericTypes" = Table.TransformColumns(#"TrimmedText", {{"SourceYear", each try Int64.From(_) otherwise null, Int64.Type}, {"UserID", each try Int64.From(_) otherwise null, Int64.Type}}),
+				    #"AddEmployeeKey" = Table.AddColumn(#"ChangedNumericTypes", "EmployeeKey", each if [FilialeCode] = null or [Matricule] = null or [Matricule] = "" then null else [FilialeCode] & "_" & [Matricule], type text),
+				    #"AddActiveFlag" = Table.AddColumn(#"AddEmployeeKey", "_EffectifsActifs", each if [EmployeeKey] = null then 0 else 1, Int64.Type),
+				    #"AddSeniorityBand" = Table.AddColumn(#"AddActiveFlag", "Seniority Band", each let EntryDate = if [DateEntree] <> null then [DateEntree] else [DateEmbauche] in SeniorityBand(FullYearsBetween(EntryDate, RefreshDate)), type text),
+				    #"SelectOutput" = Table.SelectColumns(#"AddSeniorityBand", {"FilialeCode", "FilialeName", "SnapshotDate", "SourceYear", "Matricule", "EmployeeKey", "UserID", "Nom", "Prenom", "SexeCode", "DateNaissance", "DateEmbauche", "DateEntree", "Direction", "Departement", "Service", "PosteHarmonise", "Fonction", "CodeAnalytique", "AffectationAnalytique", "CategorieConventionnelleCode", "TypeContratCode", "DateFinContrat", "StatutGeoCode", "NationaliteCode", "NiveauTCDPCode", "_EffectifsActifs", "Seniority Band"})
+				in
+				    #"SelectOutput"
+
+	annotation PBI_ResultType = Table
+

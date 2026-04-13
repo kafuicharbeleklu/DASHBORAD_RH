@@ -1,0 +1,103 @@
+table FormationMensuelle
+	lineageTag: 887b51aa-d16a-4545-8319-c94d2d573f3b
+
+	measure CompletionRate =
+			DIVIDE(
+				SUM(FormationMensuelle[CompletedTrainings]),
+				SUM(FormationMensuelle[PlannedTrainings]),
+				0
+			)
+		formatString: 0.0%
+		displayFolder: 'HR Performance\Training'
+		lineageTag: 8d46b253-bff1-4b85-bd33-c2fbbecb7427
+
+	column FilialeCode
+		dataType: string
+		lineageTag: c3bfc902-5329-43d4-bc5f-2a5ec1c5b04d
+		sourceColumn: FilialeCode
+
+	column FilialeName
+		dataType: string
+		lineageTag: 224d748d-0202-4f74-922f-b7923a21509d
+		sourceColumn: FilialeName
+
+	column MonthStartDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 650e833d-f455-4dd8-8c06-ec51234d92c2
+		summarizeBy: none
+		sourceColumn: MonthStartDate
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column SourceYear
+		dataType: int64
+		lineageTag: 09f46b59-50d4-4387-a2f8-8bc9f3f03f3e
+		summarizeBy: none
+		sourceColumn: SourceYear
+
+	column NombrePotentiels
+		dataType: int64
+		lineageTag: eff36848-05d7-4dec-a36b-28512053e98e
+		sourceColumn: NombrePotentiels
+
+	column NombreHP
+		dataType: int64
+		lineageTag: 5509f60e-ef84-4a6d-a67e-1425ae11f9c2
+		sourceColumn: NombreHP
+
+	column PlannedTrainings
+		dataType: int64
+		lineageTag: aec7aee5-7523-4237-bd4a-ef9c5cde7295
+		sourceColumn: PlannedTrainings
+
+	column CompletedTrainings
+		dataType: int64
+		lineageTag: cc7fda57-c4cc-4b20-8325-ece1a7499765
+		sourceColumn: CompletedTrainings
+
+	column TrainingHours
+		dataType: int64
+		lineageTag: 4ea06836-7305-4054-b392-864fe37e097a
+		sourceColumn: TrainingHours
+
+	column TrainedPeople
+		dataType: int64
+		lineageTag: 77ca87d1-16de-4307-a785-4ed3bff61627
+		sourceColumn: TrainedPeople
+
+	column TrainingCostActual
+		dataType: double
+		lineageTag: 068cb3d3-fa1f-4cc6-97f7-e45d9b34d41a
+		sourceColumn: TrainingCostActual
+
+	column TrainingBudget
+		dataType: double
+		lineageTag: 1f5a4bf5-42c9-4a14-b737-9427124cf73a
+		sourceColumn: TrainingBudget
+
+	partition FormationMensuelle = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(FolderPathParameter & "\" & SourceWorkbookNameParameter), null, true),
+				    FormationTable = Source{[Item="tbl_FormationMensuelle",Kind="Table"]}[Data],
+				    #"FilteredRows" = Table.SelectRows(FormationTable, each let _month = try Text.Trim(Text.From([MonthStartDate])) otherwise "" in _month <> ""),
+				    ToDate = (value as any) as nullable date =>
+				        let
+				            DirectDate = try Date.From(value) otherwise null,
+				            Serial = if DirectDate <> null then null else try Number.From(value) otherwise null
+				        in
+				            if DirectDate <> null then DirectDate else if Serial <> null then Date.AddDays(#date(1899, 12, 30), Serial) else null,
+				    #"ConvertDates" = Table.TransformColumns(#"FilteredRows", {{"MonthStartDate", ToDate, type date}}),
+				    TextColumns = {"FilialeCode", "FilialeName"},
+				    #"TrimmedText" = Table.TransformColumns(#"ConvertDates", List.Transform(TextColumns, each {_, (v) => if v = null then null else Text.Trim(Text.From(v)), type text})),
+				    #"ChangedTypes" = Table.TransformColumns(#"TrimmedText", {{"SourceYear", each try Int64.From(_) otherwise null, Int64.Type}, {"NombrePotentiels", each try Int64.From(_) otherwise null, Int64.Type}, {"NombreHP", each try Int64.From(_) otherwise null, Int64.Type}, {"PlannedTrainings", each try Int64.From(_) otherwise null, Int64.Type}, {"CompletedTrainings", each try Int64.From(_) otherwise null, Int64.Type}, {"TrainingHours", each try Int64.From(_) otherwise null, Int64.Type}, {"TrainedPeople", each try Int64.From(_) otherwise null, Int64.Type}, {"TrainingCostActual", each try Number.From(_) otherwise null, type number}, {"TrainingBudget", each try Number.From(_) otherwise null, type number}}),
+				    #"SelectOutput" = Table.SelectColumns(#"ChangedTypes", {"FilialeCode", "FilialeName", "MonthStartDate", "SourceYear", "NombrePotentiels", "NombreHP", "PlannedTrainings", "CompletedTrainings", "TrainingHours", "TrainedPeople", "TrainingCostActual", "TrainingBudget"})
+				in
+				    #"SelectOutput"
+
+	annotation PBI_ResultType = Table
+

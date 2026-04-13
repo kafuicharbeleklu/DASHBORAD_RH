@@ -1,0 +1,83 @@
+table RecrutementMensuel
+	lineageTag: 93853638-9bf9-4985-a499-1eaf766567a7
+
+	column FilialeCode
+		dataType: string
+		lineageTag: b62ba31b-b4c1-44d8-b31b-54e80e7c1b3c
+		sourceColumn: FilialeCode
+
+	column FilialeName
+		dataType: string
+		lineageTag: 7d6c2c40-a4bf-4ab2-b057-197e699122dd
+		sourceColumn: FilialeName
+
+	column MonthStartDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 81ac2b7b-1935-4f2b-80f4-891fa03af12d
+		summarizeBy: none
+		sourceColumn: MonthStartDate
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column SourceYear
+		dataType: int64
+		lineageTag: 93054384-f636-46b3-b117-6a20a6a9f863
+		summarizeBy: none
+		sourceColumn: SourceYear
+
+	column Recruitments
+		dataType: int64
+		lineageTag: 9a81108a-85b3-496f-b9a4-77e3440f9d34
+		sourceColumn: Recruitments
+
+	column RecruitmentsBudget
+		dataType: int64
+		lineageTag: d63566dd-4db1-4d99-a1c5-1f25e8a38774
+		sourceColumn: RecruitmentsBudget
+
+	column RecruitmentsOutOfBudget
+		dataType: int64
+		lineageTag: e5fdb454-0349-4e22-b703-06ba268e9a08
+		sourceColumn: RecruitmentsOutOfBudget
+
+	column RecruitmentBudget
+		dataType: double
+		lineageTag: d3f88286-6a29-4ec9-97db-f14c7a24dd48
+		sourceColumn: RecruitmentBudget
+
+	column BudgetUsed
+		dataType: double
+		lineageTag: 1124d16d-8e2a-44ab-95dc-6efb637b064c
+		sourceColumn: BudgetUsed
+
+	column OutOfBudgetCost
+		dataType: double
+		lineageTag: dafa8e9e-fc6a-45f6-a685-0618dbdada82
+		sourceColumn: OutOfBudgetCost
+
+	partition RecrutementMensuel = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(FolderPathParameter & "\" & SourceWorkbookNameParameter), null, true),
+				    RecrutementTable = Source{[Item="tbl_RecrutementMensuel",Kind="Table"]}[Data],
+				    #"FilteredRows" = Table.SelectRows(RecrutementTable, each let _month = try Text.Trim(Text.From([MonthStartDate])) otherwise "" in _month <> ""),
+				    ToDate = (value as any) as nullable date =>
+				        let
+				            DirectDate = try Date.From(value) otherwise null,
+				            Serial = if DirectDate <> null then null else try Number.From(value) otherwise null
+				        in
+				            if DirectDate <> null then DirectDate else if Serial <> null then Date.AddDays(#date(1899, 12, 30), Serial) else null,
+				    #"ConvertDates" = Table.TransformColumns(#"FilteredRows", {{"MonthStartDate", ToDate, type date}}),
+				    TextColumns = {"FilialeCode", "FilialeName"},
+				    #"TrimmedText" = Table.TransformColumns(#"ConvertDates", List.Transform(TextColumns, each {_, (v) => if v = null then null else Text.Trim(Text.From(v)), type text})),
+				    #"ChangedTypes" = Table.TransformColumns(#"TrimmedText", {{"SourceYear", each try Int64.From(_) otherwise null, Int64.Type}, {"Recruitments", each try Int64.From(_) otherwise null, Int64.Type}, {"RecruitmentsBudget", each try Int64.From(_) otherwise null, Int64.Type}, {"RecruitmentsOutOfBudget", each try Int64.From(_) otherwise null, Int64.Type}, {"RecruitmentBudget", each try Number.From(_) otherwise null, type number}, {"BudgetUsed", each try Number.From(_) otherwise null, type number}, {"OutOfBudgetCost", each try Number.From(_) otherwise null, type number}}),
+				    #"SelectOutput" = Table.SelectColumns(#"ChangedTypes", {"FilialeCode", "FilialeName", "MonthStartDate", "SourceYear", "Recruitments", "RecruitmentsBudget", "RecruitmentsOutOfBudget", "RecruitmentBudget", "BudgetUsed", "OutOfBudgetCost"})
+				in
+				    #"SelectOutput"
+
+	annotation PBI_ResultType = Table
+

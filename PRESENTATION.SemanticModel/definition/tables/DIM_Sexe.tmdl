@@ -1,0 +1,29 @@
+table DIM_Sexe
+	lineageTag: 4ef210a9-86ff-489d-b6f3-b311cab8467a
+
+	column REF_Sexe
+		dataType: string
+		lineageTag: 75b6d3cd-0843-45ea-9c93-f3d3dbe72a87
+		sourceColumn: REF_Sexe
+
+	column Label
+		dataType: string
+		lineageTag: be4b72f4-6ff1-46b0-ad07-39785bf453b7
+		sourceColumn: Label
+
+	partition DIM_Sexe = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(FolderPathParameter & "\" & SourceWorkbookNameParameter), null, true),
+				    RefTable = Source{[Item="tbl_REF_Sexe",Kind="Table"]}[Data],
+				    #"ChangedType" = Table.TransformColumnTypes(RefTable, {{"REF_Sexe", type text}, {"Label", type text}}),
+				    #"TrimmedText" = Table.TransformColumns(#"ChangedType", {{"REF_Sexe", each if _ = null then null else Text.Trim(_), type text}, {"Label", each if _ = null then null else Text.Trim(_), type text}}),
+				    #"FilteredRows" = Table.SelectRows(#"TrimmedText", each [REF_Sexe] <> null and [REF_Sexe] <> ""),
+				    #"DistinctRows" = Table.Distinct(#"FilteredRows"),
+				    #"SortedRows" = Table.Sort(#"DistinctRows", {{"Label", Order.Ascending}})
+				in
+				    #"SortedRows"
+
+	annotation PBI_ResultType = Table
+

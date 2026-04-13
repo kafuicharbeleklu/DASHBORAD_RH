@@ -1,0 +1,208 @@
+{
+  "snapshot_date": "2026-12-31",
+  "source_template": "RH_Collecte_BKO_2026.xlsx",
+  "consolidated_workbook": "RH_Collecte_SIMULATION_2026.xlsx",
+  "tables": {
+    "Effectif": 530,
+    "Embauches": 93,
+    "Departs": 60,
+    "AbsenceMensuelle": 792,
+    "FormationMensuelle": 132,
+    "RecrutementMensuel": 132,
+    "RecrutementDetail": 93,
+    "MasseSalarialeMensuelle": 132,
+    "TCDP_Headcount": 1188,
+    "TCDP_Entrees": 93,
+    "TCDP_Sorties": 60,
+    "TCDP_Genre": 1188
+  },
+  "filiales": {
+    "COO": {
+      "name": "Bénin",
+      "tables": {
+        "Effectif": 48,
+        "Embauches": 8,
+        "Departs": 5,
+        "AbsenceMensuelle": 72,
+        "FormationMensuelle": 12,
+        "RecrutementMensuel": 12,
+        "RecrutementDetail": 8,
+        "MasseSalarialeMensuelle": 12,
+        "TCDP_Headcount": 108,
+        "TCDP_Entrees": 8,
+        "TCDP_Sorties": 5,
+        "TCDP_Genre": 108
+      }
+    },
+    "OUA": {
+      "name": "Burkina Faso",
+      "tables": {
+        "Effectif": 62,
+        "Embauches": 11,
+        "Departs": 7,
+        "AbsenceMensuelle": 72,
+        "FormationMensuelle": 12,
+        "RecrutementMensuel": 12,
+        "RecrutementDetail": 11,
+        "MasseSalarialeMensuelle": 12,
+        "TCDP_Headcount": 108,
+        "TCDP_Entrees": 11,
+        "TCDP_Sorties": 7,
+        "TCDP_Genre": 108
+      }
+    },
+    "ABJ": {
+      "name": "Côte d'Ivoire",
+      "tables": {
+        "Effectif": 74,
+        "Embauches": 12,
+        "Departs": 8,
+        "AbsenceMensuelle": 72,
+        "FormationMensuelle": 12,
+        "RecrutementMensuel": 12,
+        "RecrutementDetail": 12,
+        "MasseSalarialeMensuelle": 12,
+        "TCDP_Headcount": 108,
+        "TCDP_Entrees": 12,
+        "TCDP_Sorties": 8,
+        "TCDP_Genre": 108
+      }
+    },
+    "BJL": {
+      "name": "Gambie",
+      "tables": {
+        "Effectif": 26,
+        "Embauches": 5,
+        "Departs": 3,
+        "AbsenceMensuelle": 72,
+        "FormationMensuelle": 12,
+        "RecrutementMensuel": 12,
+        "RecrutementDetail": 5,
+        "MasseSalarialeMensuelle": 12,
+        "TCDP_Headcount": 108,
+        "TCDP_Entrees": 5,
+        "TCDP_Sorties": 3,
+        "TCDP_Genre": 108
+      }
+    },
+    "CKY": {
+      "name": "Guinée",
+      "tables": {
+        "Effectif": 40,
+        "Embauches": 7,
+        "Departs": 4,
+        "AbsenceMensuelle": 72,
+        "FormationMensuelle": 12,
+        "RecrutementMensuel": 12,
+        "RecrutementDetail": 7,
+        "MasseSalarialeMensuelle": 12,
+        "TCDP_Headcount": 108,
+        "TCDP_Entrees": 7,
+        "TCDP_Sorties": 4,
+        "TCDP_Genre": 108
+      }
+    },
+    "OXB": {
+      "name": "Guinée-Bissau",
+      "tables": {
+        "Effectif": 24,
+        "Embauches": 4,
+        "Departs": 3,
+        "AbsenceMensuelle": 72,
+        "FormationMensuelle": 12,
+        "RecrutementMensuel": 12,
+        "RecrutementDetail": 4,
+        "MasseSalarialeMensuelle": 12,
+        "TCDP_Headcount": 108,
+        "TCDP_Entrees": 4,
+        "TCDP_Sorties": 3,
+        "TCDP_Genre": 108
+      }
+    },
+    "BKO": {
+      "name": "Mali",
+      "tables": {
+        "Effectif": 88,
+        "Embauches": 15,
+        "Departs": 10,
+        "AbsenceMensuelle": 72,
+        "FormationMensuelle": 12,
+        "RecrutementMensuel": 12,
+        "RecrutementDetail": 15,
+        "MasseSalarialeMensuelle": 12,
+        "TCDP_Headcount": 108,
+        "TCDP_Entrees": 15,
+        "TCDP_Sorties": 10,
+        "TCDP_Genre": 108
+      }
+    },
+    "NKC": {
+      "name": "Mauritanie",
+      "tables": {
+        "Effectif": 30,
+        "Embauches": 6,
+        "Departs": 4,
+        "AbsenceMensuelle": 72,
+        "FormationMensuelle": 12,
+        "RecrutementMensuel": 12,
+        "RecrutementDetail": 6,
+        "MasseSalarialeMensuelle": 12,
+        "TCDP_Headcount": 108,
+        "TCDP_Entrees": 6,
+        "TCDP_Sorties": 4,
+        "TCDP_Genre": 108
+      }
+    },
+    "NIM": {
+      "name": "Niger",
+      "tables": {
+        "Effectif": 32,
+        "Embauches": 6,
+        "Departs": 4,
+        "AbsenceMensuelle": 72,
+        "FormationMensuelle": 12,
+        "RecrutementMensuel": 12,
+        "RecrutementDetail": 6,
+        "MasseSalarialeMensuelle": 12,
+        "TCDP_Headcount": 108,
+        "TCDP_Entrees": 6,
+        "TCDP_Sorties": 4,
+        "TCDP_Genre": 108
+      }
+    },
+    "DKR": {
+      "name": "Sénégal",
+      "tables": {
+        "Effectif": 70,
+        "Embauches": 12,
+        "Departs": 8,
+        "AbsenceMensuelle": 72,
+        "FormationMensuelle": 12,
+        "RecrutementMensuel": 12,
+        "RecrutementDetail": 12,
+        "MasseSalarialeMensuelle": 12,
+        "TCDP_Headcount": 108,
+        "TCDP_Entrees": 12,
+        "TCDP_Sorties": 8,
+        "TCDP_Genre": 108
+      }
+    },
+    "LFW": {
+      "name": "Togo",
+      "tables": {
+        "Effectif": 36,
+        "Embauches": 7,
+        "Departs": 4,
+        "AbsenceMensuelle": 72,
+        "FormationMensuelle": 12,
+        "RecrutementMensuel": 12,
+        "RecrutementDetail": 7,
+        "MasseSalarialeMensuelle": 12,
+        "TCDP_Headcount": 108,
+        "TCDP_Entrees": 7,
+        "TCDP_Sorties": 4,
+        "TCDP_Genre": 108
+      }
+    }
+  }
+}

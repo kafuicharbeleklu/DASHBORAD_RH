@@ -1,0 +1,53 @@
+table 'HR Date'
+	lineageTag: 4cf2a1e9-ea32-4744-96cb-0a8c4a6b8201
+
+	column Date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 4cf2a1e9-ea32-4744-96cb-0a8c4a6b8202
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition 'HR Date' = m
+		mode: import
+		source =
+				let
+				    Source = List.Sort(
+				        List.Distinct(
+				            List.Combine(
+				                {
+				                    List.RemoveNulls(Table.Column(Recrutement, "DATE")),
+				                    List.RemoveNulls(Table.Column(Formation, "DATE")),
+				                    List.RemoveNulls(Table.Column(Absence, "DATE")),
+				                    List.RemoveNulls(Table.Column(#"Masse salariale", "DATE")),
+				                    List.RemoveNulls(Table.Column(Effectif, "SnapshotDate")),
+				                    List.RemoveNulls(Table.Column(Embauches, "EventDate")),
+				                    List.RemoveNulls(Table.Column(Embauches, "MonthStartDate")),
+				                    List.RemoveNulls(Table.Column(Departs, "EventDate")),
+				                    List.RemoveNulls(Table.Column(Departs, "MonthStartDate")),
+				                    List.RemoveNulls(Table.Column(AbsenceMensuelle, "MonthStartDate")),
+				                    List.RemoveNulls(Table.Column(FormationMensuelle, "MonthStartDate")),
+				                    List.RemoveNulls(Table.Column(RecrutementMensuel, "MonthStartDate")),
+				                    List.RemoveNulls(Table.Column(RecrutementDetail, "MonthStartDate")),
+				                    List.RemoveNulls(Table.Column(MasseSalarialeMensuelle, "MonthStartDate")),
+				                    List.RemoveNulls(Table.Column(TCDP_Headcount, "MonthStartDate")),
+				                    List.RemoveNulls(Table.Column(TCDP_Entrees, "EventDate")),
+				                    List.RemoveNulls(Table.Column(TCDP_Entrees, "MonthStartDate")),
+				                    List.RemoveNulls(Table.Column(TCDP_Sorties, "EventDate")),
+				                    List.RemoveNulls(Table.Column(TCDP_Sorties, "MonthStartDate")),
+				                    List.RemoveNulls(Table.Column(TCDP_Genre, "MonthStartDate"))
+				                }
+				            )
+				        )
+				    ),
+				    #"ToTable" = Table.FromList(Source, Splitter.SplitByNothing(), {"Date"}),
+				    #"ChangedType" = Table.TransformColumnTypes(#"ToTable", {{"Date", type date}})
+				in
+				    #"ChangedType"
+
+	annotation PBI_ResultType = Table
+

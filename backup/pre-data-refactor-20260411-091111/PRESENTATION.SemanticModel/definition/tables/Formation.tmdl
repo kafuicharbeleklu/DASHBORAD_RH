@@ -1,0 +1,181 @@
+table Formation
+	lineageTag: 130019ed-f714-451e-94d2-2a3d20b398b3
+
+	measure 'Training Hours' = SUM(Formation[TrainingHours])
+		formatString: 0
+		displayFolder: 'HR Performance'
+		lineageTag: 12d6c2b4-aea6-4cdc-93b2-acb64b14b462
+
+	measure 'Training Hours Latest' =
+			VAR _lastDate = CALCULATE(MAX(Formation[DATE]), ALL(Formation))
+			RETURN CALCULATE([Training Hours], Formation[DATE] = _lastDate)
+		formatString: 0
+		displayFolder: 'HR Performance'
+		lineageTag: 4fbf95df-5567-4e2c-a91f-36b219e2615b
+
+	measure 'Trained People' = SUM(Formation[TrainedPeople])
+		formatString: 0
+		displayFolder: 'HR Performance'
+		lineageTag: 976fea41-c7fe-472b-8675-8906bc4e5bbf
+
+	measure 'Trained People Latest' =
+			VAR _lastDate = CALCULATE(MAX(Formation[DATE]), ALL(Formation))
+			RETURN CALCULATE([Trained People], Formation[DATE] = _lastDate)
+		formatString: 0
+		displayFolder: 'HR Performance'
+		lineageTag: 1c47e69f-655f-4e19-91b1-6ec470784c90
+
+	measure 'Training Completion Rate' = AVERAGE(Formation[CompletionRate])
+		formatString: 0.0%
+		displayFolder: 'HR Performance'
+		lineageTag: 6549c930-8eb6-4dd2-8c6d-3de744ba33d0
+
+	measure 'Training Completion Rate Latest' =
+			VAR _lastDate = CALCULATE(MAX(Formation[DATE]), ALL(Formation))
+			RETURN CALCULATE([Training Completion Rate], Formation[DATE] = _lastDate)
+		formatString: 0.0%
+		displayFolder: 'HR Performance'
+		lineageTag: 69b76cee-d1bb-4c00-af82-475ea5653fd1
+
+	measure 'Training Budget Latest' =
+			VAR _lastDate = CALCULATE(MAX(Formation[DATE]), ALL(Formation))
+			RETURN CALCULATE([Training Budget], Formation[DATE] = _lastDate)
+		formatString: #,0
+		displayFolder: 'HR Performance'
+		lineageTag: 8f719386-9957-4fa0-993c-3720ffcb4312
+
+	measure 'Training Plan Count' = SUM(Formation[PlannedTrainings])
+		formatString: 0
+		displayFolder: 'HR Performance'
+		lineageTag: 12d6c2b4-aea6-4cdc-93b2-acb64b14b463
+
+	measure 'Completed Trainings' = SUM(Formation[CompletedTrainings])
+		formatString: 0
+		displayFolder: 'HR Performance'
+		lineageTag: 12d6c2b4-aea6-4cdc-93b2-acb64b14b464
+
+	measure 'Training Plan Count Latest' =
+			VAR _lastDate = CALCULATE(MAX(Formation[DATE]), ALL(Formation))
+			RETURN CALCULATE([Training Plan Count], Formation[DATE] = _lastDate)
+		formatString: 0
+		displayFolder: 'HR Performance'
+		lineageTag: 12d6c2b4-aea6-4cdc-93b2-acb64b14b465
+
+	measure 'Completed Trainings Latest' =
+			VAR _lastDate = CALCULATE(MAX(Formation[DATE]), ALL(Formation))
+			RETURN CALCULATE([Completed Trainings], Formation[DATE] = _lastDate)
+		formatString: 0
+		displayFolder: 'HR Performance'
+		lineageTag: 12d6c2b4-aea6-4cdc-93b2-acb64b14b466
+
+	measure 'Training Actual Amount' = SUM(Formation[TrainingCostActual])
+		formatString: #,0
+		displayFolder: 'HR Performance'
+		lineageTag: 12d6c2b4-aea6-4cdc-93b2-acb64b14b467
+
+	measure 'Training Actual Amount Latest' =
+			VAR _lastDate = CALCULATE(MAX(Formation[DATE]), ALL(Formation))
+			RETURN CALCULATE([Training Actual Amount], Formation[DATE] = _lastDate)
+		formatString: #,0
+		displayFolder: 'HR Performance'
+		lineageTag: 12d6c2b4-aea6-4cdc-93b2-acb64b14b468
+
+	measure 'Training Budget' = SUM(Formation[TrainingBudget])
+		formatString: #,0
+		displayFolder: 'HR Performance'
+		lineageTag: 12d6c2b4-aea6-4cdc-93b2-acb64b14b469
+
+	column DATE
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 3bccb3cc-5153-4462-a5cd-923a471d0a7a
+		summarizeBy: none
+		sourceColumn: DATE
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column TrainingHours
+		dataType: int64
+		formatString: 0
+		lineageTag: b0e1a7bc-2eaf-4032-94dc-add5957ad779
+		summarizeBy: sum
+		sourceColumn: TrainingHours
+
+		annotation SummarizationSetBy = Automatic
+
+	column TrainedPeople
+		dataType: int64
+		formatString: 0
+		lineageTag: 3f76f7fe-5c0d-426e-a834-494025f71ac4
+		summarizeBy: sum
+		sourceColumn: TrainedPeople
+
+		annotation SummarizationSetBy = Automatic
+
+	column CompletionRate
+		dataType: double
+		lineageTag: 91838880-f566-4366-a798-239514321859
+		summarizeBy: sum
+		sourceColumn: CompletionRate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column TrainingBudget
+		dataType: int64
+		formatString: 0
+		lineageTag: e4b824da-98e7-4405-a0e0-3127939ffd7e
+		summarizeBy: sum
+		sourceColumn: TrainingBudget
+
+		annotation SummarizationSetBy = Automatic
+
+	column PlannedTrainings
+		dataType: int64
+		formatString: 0
+		lineageTag: 12d6c2b4-aea6-4cdc-93b2-acb64b14b470
+		summarizeBy: sum
+		sourceColumn: PlannedTrainings
+
+		annotation SummarizationSetBy = Automatic
+
+	column CompletedTrainings
+		dataType: int64
+		formatString: 0
+		lineageTag: 12d6c2b4-aea6-4cdc-93b2-acb64b14b471
+		summarizeBy: sum
+		sourceColumn: CompletedTrainings
+
+		annotation SummarizationSetBy = Automatic
+
+	column TrainingCostActual
+		dataType: int64
+		formatString: 0
+		lineageTag: 12d6c2b4-aea6-4cdc-93b2-acb64b14b472
+		summarizeBy: sum
+		sourceColumn: TrainingCostActual
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Formation = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents("P:\PRESENTATION DATA RH\DONNEES RH Decembre 2025 MALI V2.xlsx"), null, true),
+				    Formation_Sheet = Source{[Item="Formation",Kind="Sheet"]}[Data],
+				    #"PromoteHeaders" = Table.PromoteHeaders(Formation_Sheet, [PromoteAllScalars=true]),
+				    _cols = Table.ColumnNames(#"PromoteHeaders"),
+				    #"KeepColumns" = Table.SelectColumns(#"PromoteHeaders", {_cols{0}, _cols{3}, _cols{4}, _cols{5}, _cols{6}, _cols{7}, _cols{8}, _cols{9}}),
+				    #"RenameColumns" = Table.RenameColumns(#"KeepColumns", {{_cols{0}, "DATE"}, {_cols{3}, "PlannedTrainings"}, {_cols{4}, "CompletedTrainings"}, {_cols{5}, "TrainingHours"}, {_cols{6}, "TrainedPeople"}, {_cols{7}, "CompletionRate"}, {_cols{8}, "TrainingCostActual"}, {_cols{9}, "TrainingBudget"}}),
+				    #"MonthlyRows" = Table.FirstN(#"RenameColumns", each (try Number.From([DATE]) otherwise null) <> null),
+				    #"NormalizeDate" = Table.TransformColumns(#"MonthlyRows", {{"DATE", each Number.From(_), type number}}),
+				    #"ConvertDate" = Table.TransformColumns(#"NormalizeDate", {{"DATE", each Date.AddDays(#date(1899, 12, 30), _), type date}}),
+				    #"ChangedType" = Table.TransformColumnTypes(#"ConvertDate", {{"PlannedTrainings", Int64.Type}, {"CompletedTrainings", Int64.Type}, {"TrainingHours", Int64.Type}, {"TrainedPeople", Int64.Type}, {"CompletionRate", type number}, {"TrainingCostActual", Int64.Type}, {"TrainingBudget", Int64.Type}})
+				in
+				    #"ChangedType"
+
+	annotation PBI_ResultType = Table
+

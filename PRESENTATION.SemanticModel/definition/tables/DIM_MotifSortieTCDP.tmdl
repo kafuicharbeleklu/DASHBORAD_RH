@@ -1,0 +1,29 @@
+table DIM_MotifSortieTCDP
+	lineageTag: 8e87c9e7-4cfc-488d-82af-3623a8ed52b2
+
+	column REF_MotifSortieTCDP
+		dataType: string
+		lineageTag: 070781e1-9437-4ea1-8288-7cc676daebc3
+		sourceColumn: REF_MotifSortieTCDP
+
+	column Label
+		dataType: string
+		lineageTag: 91926eb5-f594-4e25-852e-85dbafa1f2f7
+		sourceColumn: Label
+
+	partition DIM_MotifSortieTCDP = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(FolderPathParameter & "\" & SourceWorkbookNameParameter), null, true),
+				    RefTable = Source{[Item="tbl_REF_MotifSortieTCDP",Kind="Table"]}[Data],
+				    #"ChangedType" = Table.TransformColumnTypes(RefTable, {{"REF_MotifSortieTCDP", type text}, {"Label", type text}}),
+				    #"TrimmedText" = Table.TransformColumns(#"ChangedType", {{"REF_MotifSortieTCDP", each if _ = null then null else Text.Trim(_), type text}, {"Label", each if _ = null then null else Text.Trim(_), type text}}),
+				    #"FilteredRows" = Table.SelectRows(#"TrimmedText", each [REF_MotifSortieTCDP] <> null and [REF_MotifSortieTCDP] <> ""),
+				    #"DistinctRows" = Table.Distinct(#"FilteredRows"),
+				    #"SortedRows" = Table.Sort(#"DistinctRows", {{"Label", Order.Ascending}})
+				in
+				    #"SortedRows"
+
+	annotation PBI_ResultType = Table
+

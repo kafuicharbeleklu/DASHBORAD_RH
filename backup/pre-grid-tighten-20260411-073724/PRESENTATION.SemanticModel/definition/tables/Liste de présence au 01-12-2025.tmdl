@@ -1,0 +1,344 @@
+table 'Liste de présence au 01-12-2025'
+	lineageTag: d9c45a9e-711c-442c-a3ca-351c7150695a
+
+	measure Headcount =
+			VAR _headcount =
+				CALCULATE(
+					DISTINCTCOUNT('Liste de présence au 01-12-2025'[USER ID]),
+					'Liste de présence au 01-12-2025'[USER ID] <> BLANK()
+				)
+			RETURN IF(_headcount = 0, BLANK(), _headcount)
+		formatString: 0
+		displayFolder: 'Dashboard RH'
+		lineageTag: 80b55da1-bfe6-4c71-b666-7c39afaae821
+
+	measure 'Age Moyen' =
+			AVERAGEX(
+				FILTER(
+					'Liste de présence au 01-12-2025',
+					'Liste de présence au 01-12-2025'[USER ID] <> BLANK()
+				),
+				'Liste de présence au 01-12-2025'[Age]
+			)
+		formatString: 0.0" ans"
+		displayFolder: 'Dashboard RH'
+		lineageTag: 906aa09f-1f5e-4a22-9bbd-844a4c5eebb2
+
+	measure 'Femmes Actives' =
+			VAR _femmes =
+				CALCULATE(
+					DISTINCTCOUNT('Liste de présence au 01-12-2025'[USER ID]),
+					'Liste de présence au 01-12-2025'[USER ID] <> BLANK(),
+					'Liste de présence au 01-12-2025'[Sexe] = "Féminin"
+				)
+			RETURN IF(_femmes = 0, BLANK(), _femmes)
+		formatString: 0
+		displayFolder: 'Dashboard RH'
+		lineageTag: e2a7df8c-7d3d-422f-8bd7-cbaef1905154
+
+	measure 'Taux de Diversité' = DIVIDE([Femmes Actives], [Headcount])
+		formatString: 0.0%
+		displayFolder: 'Dashboard RH'
+		lineageTag: 0c964894-818e-4b1f-9f10-b9f6deffeb70
+
+	measure 'Ancienneté Moyenne' =
+			AVERAGEX(
+				FILTER(
+					'Liste de présence au 01-12-2025',
+					'Liste de présence au 01-12-2025'[USER ID] <> BLANK()
+				),
+				'Liste de présence au 01-12-2025'[Ancienneté2]
+			)
+		formatString: 0.0" ans"
+		displayFolder: 'Dashboard RH'
+		lineageTag: a54bd686-852a-4541-a8d6-4c9a3863a4d8
+
+	measure 'Locaux Actifs' = CALCULATE([Headcount], 'Liste de présence au 01-12-2025'[Statut Local ou Expatrié?] = "Local")
+		formatString: 0
+		displayFolder: 'Dashboard RH'
+		lineageTag: a30a9e24-da13-42bd-8509-ecef20b6a935
+
+	measure 'Expatriés Actifs' = CALCULATE([Headcount], 'Liste de présence au 01-12-2025'[Statut Local ou Expatrié?] = "Expatrié")
+		formatString: 0
+		displayFolder: 'Dashboard RH'
+		lineageTag: 6a6b6e84-0d8f-44ba-bf20-e5a436469e4e
+
+	measure 'Départs 2025' =
+			CALCULATE(
+				COUNTROWS('Départ'),
+				FILTER('Départ', YEAR('Départ'[Date de départ]) = 2025)
+			)
+		formatString: 0
+		displayFolder: 'Dashboard RH'
+		lineageTag: 36dceb8e-45d8-4b4f-9b7a-db7e8a837c0f
+
+	measure 'Recrutements 2025' =
+			CALCULATE(
+				COUNTROWS(Embauche),
+				FILTER(Embauche, YEAR(Embauche[Date d'embauche]) = 2025)
+			)
+		formatString: 0
+		displayFolder: 'Dashboard RH'
+		lineageTag: 75b11b25-556f-4867-9fdf-e9eef3ec9faf
+
+	measure 'Mobilité 2025' =
+			CALCULATE(
+				COUNTROWS('Départ'),
+				FILTER(
+					'Départ',
+					YEAR('Départ'[Date de départ]) = 2025
+						&& (
+							CONTAINSSTRING(LOWER('Départ'[Motif de départ]), "mobilit")
+							|| NOT ISBLANK('Départ'[Précisez pays si mobilité])
+						)
+				)
+			)
+		formatString: 0
+		displayFolder: 'Dashboard RH'
+		lineageTag: 7f74050f-d351-47b2-adf1-8ad8aaefe417
+
+	measure 'Turnover 2025' = DIVIDE([Départs 2025], [Headcount])
+		formatString: 0.0%
+		displayFolder: 'Dashboard RH'
+		lineageTag: 48234881-5dd0-4433-9b2d-44607a379057
+
+	column Société
+		dataType: string
+		lineageTag: ba8ce15a-f5fb-4985-a4a8-2ccd4c3e2b47
+		summarizeBy: none
+		sourceColumn: Société
+
+		annotation SummarizationSetBy = Automatic
+
+	column Matricule
+		dataType: int64
+		formatString: 0
+		lineageTag: 66c61d14-6947-4448-9cd9-ad3ff4132196
+		summarizeBy: sum
+		sourceColumn: Matricule
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'USER ID'
+		dataType: int64
+		formatString: 0
+		lineageTag: 83f2be04-edbc-4e8f-abfb-23bf49eed1d5
+		summarizeBy: count
+		sourceColumn: USER ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Nom
+		dataType: string
+		lineageTag: 0d14abd0-3492-4b0e-b05f-13faca3c3709
+		summarizeBy: none
+		sourceColumn: Nom
+
+		annotation SummarizationSetBy = Automatic
+
+	column Prénom
+		dataType: string
+		lineageTag: fa22fd33-1794-4e41-a5d1-5a43bda8cc2e
+		summarizeBy: none
+		sourceColumn: Prénom
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sexe
+		dataType: string
+		lineageTag: 26beffbd-82ca-49b5-a529-792634a2996e
+		summarizeBy: none
+		sourceColumn: Sexe
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Date de naissance'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 087dfd69-f4a0-4ee2-8100-1b8560a8d818
+		summarizeBy: none
+		sourceColumn: Date de naissance
+
+		variation Variation
+			isDefault
+			relationship: 65f8393e-3d7f-4bd5-bd45-bc410f3b70c1
+			defaultHierarchy: LocalDateTable_15a03166-e19c-4e23-bd69-958e6596add0.'Hiérarchie de dates'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Age
+		dataType: int64
+		formatString: 0
+		lineageTag: 2208e13c-8a75-42eb-933d-f0f8d1563438
+		summarizeBy: sum
+		sourceColumn: Age
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Date d''embauche'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 6e510ac5-bdc5-4baf-b5ee-793d55ff0436
+		summarizeBy: none
+		sourceColumn: Date d'embauche
+
+		variation Variation
+			isDefault
+			relationship: 308e7be6-5747-4b20-a97a-8d851d0f7616
+			defaultHierarchy: LocalDateTable_5f8af139-d576-46bc-af0f-03d283b8a71a.'Hiérarchie de dates'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Direction
+		dataType: string
+		lineageTag: 0578a414-6d66-4996-8e17-004ef3a5dbb6
+		summarizeBy: none
+		sourceColumn: Direction
+
+		annotation SummarizationSetBy = Automatic
+
+	column Département
+		dataType: string
+		lineageTag: 9c0528a3-ccdb-454d-bcab-2f6862e05aa7
+		summarizeBy: none
+		sourceColumn: Département
+
+		annotation SummarizationSetBy = Automatic
+
+	column Service
+		dataType: string
+		lineageTag: deb52a6a-293e-479e-9d6f-a8bbeb46add6
+		summarizeBy: none
+		sourceColumn: Service
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Poste harmonisé'
+		dataType: string
+		lineageTag: f0a16f81-72be-45f6-91fc-78c588127c80
+		summarizeBy: none
+		sourceColumn: Poste harmonisé
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fonction
+		dataType: string
+		lineageTag: aadec21b-3240-4f49-b561-f060bb5aecce
+		summarizeBy: none
+		sourceColumn: Fonction
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Date d''entrée'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 23002fa9-27a4-4dac-81f9-848e91e67d6c
+		summarizeBy: none
+		sourceColumn: Date d'entrée
+
+		variation Variation
+			isDefault
+			relationship: 307c55c2-1536-4a93-a0a8-e3e901598f60
+			defaultHierarchy: LocalDateTable_6d584855-842f-4e5b-97b7-16372e34e401.'Hiérarchie de dates'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'CODE Analytique'
+		dataType: string
+		lineageTag: 10e919d9-3163-4937-98bd-0746ac312462
+		summarizeBy: none
+		sourceColumn: CODE Analytique
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Affectation Analytique '
+		dataType: string
+		lineageTag: 934b405d-e1ee-4013-98bd-776d23ff3231
+		summarizeBy: none
+		sourceColumn: "Affectation Analytique "
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Catégorie conventionnelle'
+		dataType: string
+		lineageTag: bc683843-c2aa-46a7-b5e0-f5e51d2b890b
+		summarizeBy: none
+		sourceColumn: Catégorie conventionnelle
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Type de contrat'
+		dataType: string
+		lineageTag: 999e1958-f99a-4cd6-9aed-52d852b40451
+		summarizeBy: none
+		sourceColumn: Type de contrat
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Si CDD ou stagiaire, merci de préciser la date de fin de contrat'
+		dataType: string
+		lineageTag: de5b6ebb-6bb9-48f8-9c24-d913391a4c59
+		summarizeBy: none
+		sourceColumn: Si CDD ou stagiaire, merci de préciser la date de fin de contrat
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Statut Local ou Expatrié?'
+		dataType: string
+		lineageTag: a36d8d9b-9ff6-4eb1-a171-9c2ee6cd6082
+		summarizeBy: none
+		sourceColumn: Statut Local ou Expatrié?
+
+		annotation SummarizationSetBy = Automatic
+
+	column Nationalité
+		dataType: string
+		lineageTag: 2e49b737-dd9e-468c-89ce-b15549656845
+		summarizeBy: none
+		sourceColumn: Nationalité
+
+		annotation SummarizationSetBy = Automatic
+
+	column Ancienneté2
+		dataType: int64
+		formatString: 0
+		lineageTag: b59600f1-5a61-483f-9a2f-1ec1ef729d4e
+		summarizeBy: sum
+		sourceColumn: Ancienneté2
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tranche d''age'
+		dataType: string
+		lineageTag: 1816fc7e-3df0-4468-8fd4-e16ce9ab23cb
+		summarizeBy: none
+		sourceColumn: Tranche d'age
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tranche d''ancienneté'
+		dataType: string
+		lineageTag: 279b6afb-6dd1-475c-b572-9d74cb0a972b
+		summarizeBy: none
+		sourceColumn: Tranche d'ancienneté
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Liste de présence au 01-12-2025' = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents("P:\PRESENTATION DATA RH\DONNEES RH Decembre 2025 MALI V2.xlsx"), null, true),
+				    Liste_Initiale_Table = Source{[Item="Liste_Initiale",Kind="Table"]}[Data],
+				    #"Type modifié" = Table.TransformColumnTypes(Liste_Initiale_Table,{{"Société", type text}, {"Matricule", Int64.Type}, {"USER ID", Int64.Type}, {"Nom", type text}, {"Prénom", type text}, {"Sexe", type text}, {"Date de naissance", type date}, {"Age", Int64.Type}, {"Date d'embauche", type date}, {"Direction", type text}, {"Département", type text}, {"Service", type text}, {"Poste harmonisé", type text}, {"Fonction", type text}, {"Date d'entrée", type date}, {"CODE Analytique", type text}, {"Affectation Analytique ", type text}, {"Catégorie conventionnelle", type text}, {"Type de contrat", type text}, {"Si CDD ou stagiaire, merci de préciser la date de fin de contrat", type text}, {"Statut Local ou Expatrié?", type text}, {"Nationalité", type text}, {"Ancienneté2", Int64.Type}, {"Tranche d'age", type text}, {"Tranche d'ancienneté", type text}})
+				in
+				    #"Type modifié"
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,333 @@
+table Départ
+	lineageTag: ba70b40d-acf2-4890-9824-a3f6d038950b
+
+	measure 'Departures Count' =
+			VAR _count =
+				CALCULATE(
+					COUNTROWS('Départ'),
+					'Départ'[Date de départ] <> BLANK()
+				)
+			RETURN COALESCE(_count, 0)
+		formatString: 0
+		displayFolder: 'Dashboard RH'
+		lineageTag: 3f0cb8d6-6fb2-4c3f-8c62-0c9c4fba0101
+
+	measure 'Voluntary Leaves' =
+			CALCULATE(
+				[Departures Count],
+				'Départ'[LeaveType] = "Voluntary"
+			)
+		formatString: 0
+		displayFolder: 'Dashboard RH'
+		lineageTag: 3f0cb8d6-6fb2-4c3f-8c62-0c9c4fba0102
+
+	measure 'Voluntary Leave Rate' = DIVIDE([Voluntary Leaves], [Departures Count])
+		formatString: 0.0%
+		displayFolder: 'Dashboard RH'
+		lineageTag: 3f0cb8d6-6fb2-4c3f-8c62-0c9c4fba0103
+
+	column Société
+		dataType: string
+		lineageTag: 0fa8eecc-ace5-4b3d-8144-6415f7ae36a2
+		summarizeBy: none
+		sourceColumn: Société
+
+		annotation SummarizationSetBy = Automatic
+
+	column Matricule
+		dataType: string
+		lineageTag: 99ac413a-9e44-437a-b999-a301e52157b9
+		summarizeBy: none
+		sourceColumn: Matricule
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'User ID'
+		dataType: int64
+		formatString: 0
+		lineageTag: 762ff889-721e-4d4a-9664-52a34fdd486a
+		summarizeBy: count
+		sourceColumn: User ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Nom
+		dataType: string
+		lineageTag: aa5d1e18-8737-4e05-8228-6d70ddb57c28
+		summarizeBy: none
+		sourceColumn: Nom
+
+		annotation SummarizationSetBy = Automatic
+
+	column Prénom
+		dataType: string
+		lineageTag: af984915-9f97-4a03-a88d-d81832fda35b
+		summarizeBy: none
+		sourceColumn: Prénom
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sexe
+		dataType: string
+		lineageTag: 6e43b2ab-005c-45d6-9dd0-41ebead31081
+		summarizeBy: none
+		sourceColumn: Sexe
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Date de naissance'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 871a0c5b-9f66-4a6d-9225-475b43278908
+		summarizeBy: none
+		sourceColumn: Date de naissance
+
+		variation Variation
+			isDefault
+			relationship: c0a9d51e-8212-49a6-acc3-fdd715ef2611
+			defaultHierarchy: LocalDateTable_db2233cd-bb84-4481-b67d-f8661b36599e.'Hiérarchie de dates'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Age
+		dataType: int64
+		formatString: 0
+		lineageTag: e0a6469f-fad6-4413-abe8-23feb28cc444
+		summarizeBy: sum
+		sourceColumn: Age
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Date d''embauche'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 2a52d10b-dc88-413f-a2e9-95c208d77b98
+		summarizeBy: none
+		sourceColumn: Date d'embauche
+
+		variation Variation
+			isDefault
+			relationship: 7c5795a7-0ee7-4960-823b-e371df40d338
+			defaultHierarchy: LocalDateTable_9fa522d1-29ea-4bf3-8ab2-7d7f7a1e7db6.'Hiérarchie de dates'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Direction
+		dataType: string
+		lineageTag: f9612cd7-a280-4f81-b3e3-121762b52ff3
+		summarizeBy: none
+		sourceColumn: Direction
+
+		annotation SummarizationSetBy = Automatic
+
+	column Département
+		dataType: string
+		lineageTag: ee231b1d-11d8-418d-8018-c3b1a8fe75c1
+		summarizeBy: none
+		sourceColumn: Département
+
+		annotation SummarizationSetBy = Automatic
+
+	column Service
+		dataType: string
+		lineageTag: 834b549b-b902-44e0-a73d-277b75000255
+		summarizeBy: none
+		sourceColumn: Service
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Poste harmonisé'
+		dataType: string
+		lineageTag: 27206a0e-1c36-4e6a-8794-448df286673f
+		summarizeBy: none
+		sourceColumn: Poste harmonisé
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fonction
+		dataType: string
+		lineageTag: fb2d952c-6e92-4880-b057-4e78f54d5e58
+		summarizeBy: none
+		sourceColumn: Fonction
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Date d''entrée'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 7c6fb1d4-8b1d-488a-a658-0e3db21a8df9
+		summarizeBy: none
+		sourceColumn: Date d'entrée
+
+		variation Variation
+			isDefault
+			relationship: 1bf06863-b49d-4d83-88b7-c2496943b3d7
+			defaultHierarchy: LocalDateTable_581eba64-8f4e-4a0f-9a4f-f3fa28f088af.'Hiérarchie de dates'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'CODE Analytique'
+		dataType: string
+		lineageTag: c2944f54-0696-45fc-8d5d-cb9c4863926f
+		summarizeBy: none
+		sourceColumn: CODE Analytique
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Affectation Analytique '
+		dataType: string
+		lineageTag: faf457e5-d94c-47fb-a28f-2035a218c79f
+		summarizeBy: none
+		sourceColumn: "Affectation Analytique "
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Catégorie conventionnelle'
+		dataType: string
+		lineageTag: 558319b8-0538-4457-ad81-9c3b578ab5ef
+		summarizeBy: none
+		sourceColumn: Catégorie conventionnelle
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Type de contrat'
+		dataType: string
+		lineageTag: 254174fa-eb3d-4077-b4e4-3b592ca601a2
+		summarizeBy: none
+		sourceColumn: Type de contrat
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Si CDD ou stagiaire, merci de préciser la date de fin de contrat'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 17da9e13-3d43-4095-92cb-03ba30d16611
+		summarizeBy: none
+		sourceColumn: Si CDD ou stagiaire, merci de préciser la date de fin de contrat
+
+		variation Variation
+			isDefault
+			relationship: 2a212c8e-e87a-485e-bcba-400f81118507
+			defaultHierarchy: LocalDateTable_28e73843-dea7-41a9-9459-5c3d600a6595.'Hiérarchie de dates'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Statut Local ou Expatrié?'
+		dataType: string
+		lineageTag: 22b8ddd1-7d1a-42de-9fb1-4cf476289224
+		summarizeBy: none
+		sourceColumn: Statut Local ou Expatrié?
+
+		annotation SummarizationSetBy = Automatic
+
+	column Nationalité
+		dataType: string
+		lineageTag: 97d3ac1f-71b6-4039-a392-ed2bff35b4c5
+		summarizeBy: none
+		sourceColumn: Nationalité
+
+		annotation SummarizationSetBy = Automatic
+
+	column Ancienneté
+		dataType: int64
+		formatString: 0
+		lineageTag: 3070a71a-fdc9-4dcd-81e4-f6753f7451ec
+		summarizeBy: sum
+		sourceColumn: Ancienneté
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Date de départ'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: cf723107-774a-463c-9e6e-1aa30ddc0bad
+		summarizeBy: none
+		sourceColumn: Date de départ
+
+		variation Variation
+			isDefault
+			relationship: b08b3205-af72-4e83-a8c4-e4c5c39f2890
+			defaultHierarchy: LocalDateTable_be54c1e0-9744-49b5-98d1-74e91f9f971f.'Hiérarchie de dates'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Motif de départ'
+		dataType: string
+		lineageTag: 65b01259-f92e-4ab5-ae2b-052fb034609e
+		summarizeBy: none
+		sourceColumn: Motif de départ
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Précisez pays si mobilité'
+		dataType: string
+		lineageTag: 20e14a8a-08fa-454c-b282-138985fe7a8c
+		summarizeBy: none
+		sourceColumn: Précisez pays si mobilité
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Niveau TCDP'
+		dataType: string
+		lineageTag: e99dc4f1-8c8e-4324-b0bc-39b26425d8cd
+		summarizeBy: none
+		sourceColumn: Niveau TCDP
+
+		annotation SummarizationSetBy = Automatic
+
+	column Colonne1
+		dataType: string
+		lineageTag: 3cf8b42d-7fa5-4498-850d-1e563ffebc59
+		summarizeBy: none
+		sourceColumn: Colonne1
+
+		annotation SummarizationSetBy = Automatic
+
+	column Colonne2
+		dataType: string
+		lineageTag: 0495c45f-e103-4336-a6cf-537112092628
+		summarizeBy: none
+		sourceColumn: Colonne2
+
+		annotation SummarizationSetBy = Automatic
+
+	column Colonne3
+		dataType: string
+		lineageTag: 9547476b-a41b-45f5-8c4e-2dc8185face0
+		summarizeBy: none
+		sourceColumn: Colonne3
+
+		annotation SummarizationSetBy = Automatic
+
+	column LeaveType
+		dataType: string
+		lineageTag: 3f0cb8d6-6fb2-4c3f-8c62-0c9c4fba0104
+		summarizeBy: none
+		sourceColumn: LeaveType
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Départ = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents("P:\PRESENTATION DATA RH\DONNEES RH Decembre 2025 MALI V2.xlsx"), null, true),
+				    Départ_Sheet = Source{[Item="Départ",Kind="Sheet"]}[Data],
+				    #"En-têtes promus" = Table.PromoteHeaders(Départ_Sheet, [PromoteAllScalars=true]),
+				    #"Type modifié" = Table.TransformColumnTypes(#"En-têtes promus",{{"Société", type text}, {"Matricule", type any}, {"User ID", Int64.Type}, {"Nom", type text}, {"Prénom", type text}, {"Sexe", type text}, {"Date de naissance", type date}, {"Age", Int64.Type}, {"Date d'embauche", type date}, {"Direction", type text}, {"Département", type text}, {"Service", type text}, {"Poste harmonisé", type text}, {"Fonction", type text}, {"Date d'entrée", type date}, {"CODE Analytique", type text}, {"Affectation Analytique ", type text}, {"Catégorie conventionnelle", type text}, {"Type de contrat", type text}, {"Si CDD ou stagiaire, merci de préciser la date de fin de contrat", type date}, {"Statut Local ou Expatrié?", type text}, {"Nationalité", type text}, {"Ancienneté", Int64.Type}, {"Date de départ", type date}, {"Motif de départ", type text}, {"Précisez pays si mobilité", type text}, {"Niveau TCDP", type any}, {"Colonne1", type any}, {"Colonne2", type any}, {"Colonne3", type any}}),
+				    #"LeaveType ajouté" = Table.AddColumn(#"Type modifié", "LeaveType", each let _motif = Text.Lower(Text.From([Motif de départ])) in if Text.Contains(_motif, "démission") or Text.Contains(_motif, "abandon") or Text.Contains(_motif, "rupture") or Text.Contains(_motif, "disponibilit") then "Voluntary" else "Other", type text)
+				in
+				    #"LeaveType ajouté"
+
+	annotation PBI_ResultType = Table
+

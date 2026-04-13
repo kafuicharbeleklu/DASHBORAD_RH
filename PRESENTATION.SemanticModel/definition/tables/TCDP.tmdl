@@ -1,0 +1,179 @@
+table TCDP
+	lineageTag: 26fd1b62-74f9-4f04-84f4-5c76dfdec14f
+
+	measure 'TCDP Total' = SUM(TCDP[Total])
+		formatString: 0
+		displayFolder: 'TCDP\Overview'
+		lineageTag: c22bf8a2-1e64-43ec-8898-944b3bdd7b3c
+
+	measure 'TCDP Total Latest' =
+			VAR _lastDate = CALCULATE(MAX(TCDP[DATE]), ALL(TCDP))
+			RETURN CALCULATE([TCDP Total], TCDP[DATE] = _lastDate)
+		formatString: 0
+		displayFolder: 'TCDP\Overview'
+		lineageTag: b85119ad-2091-4eed-a458-cd5e12c5ba1f
+
+	measure 'TCDP Level1' = SUM(TCDP[Level1])
+		formatString: 0
+		displayFolder: 'TCDP\Overview'
+		lineageTag: 1ddefa20-2b48-4afc-bd28-6b0607541013
+
+	measure 'TCDP Level1 Latest' =
+			VAR _lastDate = CALCULATE(MAX(TCDP[DATE]), ALL(TCDP))
+			RETURN CALCULATE([TCDP Level1], TCDP[DATE] = _lastDate)
+		formatString: 0
+		displayFolder: 'TCDP\Overview'
+		lineageTag: 94061f14-f6d3-4ca4-9c42-f70143df86f0
+
+	measure 'TCDP Level3A' = SUM(TCDP[Level3A])
+		formatString: 0
+		displayFolder: 'TCDP\Overview'
+		lineageTag: a20509ae-d1a2-4b11-a11c-fb2e4afb03a2
+
+	measure 'TCDP Level3A Latest' =
+			VAR _lastDate = CALCULATE(MAX(TCDP[DATE]), ALL(TCDP))
+			RETURN CALCULATE([TCDP Level3A], TCDP[DATE] = _lastDate)
+		formatString: 0
+		displayFolder: 'TCDP\Overview'
+		lineageTag: 7919f269-5d88-4279-a0e7-660c1a5efe5c
+
+	measure 'TCDP Level3B' = SUM(TCDP[Level3B])
+		formatString: 0
+		displayFolder: 'TCDP\Overview'
+		lineageTag: ccf1d6f3-98cf-4aab-9f03-5a5263c46749
+
+	measure 'TCDP Level3B Latest' =
+			VAR _lastDate = CALCULATE(MAX(TCDP[DATE]), ALL(TCDP))
+			RETURN CALCULATE([TCDP Level3B], TCDP[DATE] = _lastDate)
+		formatString: 0
+		displayFolder: 'TCDP\Overview'
+		lineageTag: 491aefc1-e517-4946-aed7-3e2056c55464
+
+	measure 'TCDP Level3C' = SUM(TCDP[Level3C])
+		formatString: 0
+		displayFolder: 'TCDP\Overview'
+		lineageTag: 35bdcc69-5aa3-4273-bde5-0fe5e8a0ea24
+
+	measure 'TCDP Level3C Latest' =
+			VAR _lastDate = CALCULATE(MAX(TCDP[DATE]), ALL(TCDP))
+			RETURN CALCULATE([TCDP Level3C], TCDP[DATE] = _lastDate)
+		formatString: 0
+		displayFolder: 'TCDP\Overview'
+		lineageTag: 0256fe97-383a-412e-8ade-ce81e08d4b5e
+
+	measure 'TCDP Level4' = SUM(TCDP[Level4])
+		formatString: 0
+		displayFolder: 'TCDP\Overview'
+		lineageTag: e5bdb185-899c-4085-9ec3-6f95799ffc3a
+
+	measure 'TCDP Level4 Latest' =
+			VAR _lastDate = CALCULATE(MAX(TCDP[DATE]), ALL(TCDP))
+			RETURN CALCULATE([TCDP Level4], TCDP[DATE] = _lastDate)
+		formatString: 0
+		displayFolder: 'TCDP\Overview'
+		lineageTag: b49303af-6e28-47aa-98e0-885bb69d9e01
+
+	measure 'TCDP Coverage' = DIVIDE([TCDP Total Latest], 338)
+		formatString: 0.0%
+		displayFolder: 'TCDP\Overview'
+		lineageTag: 206563b3-6967-4f14-86a1-e09dc38757f3
+
+	column DATE
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 4ce8a418-fbc7-4b07-88b8-c2dbc5d6f801
+		summarizeBy: none
+		sourceColumn: DATE
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Level1
+		dataType: double
+		formatString: 0
+		lineageTag: 6141b515-9940-476a-9a31-6b1ab76dc4fb
+		summarizeBy: sum
+		sourceColumn: Level1
+
+		annotation SummarizationSetBy = Automatic
+
+	column Level3A
+		dataType: double
+		formatString: 0
+		lineageTag: 6dcae687-28f0-4d6b-b0ea-c54c93e3138a
+		summarizeBy: sum
+		sourceColumn: Level3A
+
+		annotation SummarizationSetBy = Automatic
+
+	column Level3B
+		dataType: double
+		formatString: 0
+		lineageTag: 5ef838ec-62b3-4905-a0ce-4d1a825105f1
+		summarizeBy: sum
+		sourceColumn: Level3B
+
+		annotation SummarizationSetBy = Automatic
+
+	column Level3C
+		dataType: double
+		formatString: 0
+		lineageTag: 9d7d4818-278d-4088-9850-4bdc88f50206
+		summarizeBy: sum
+		sourceColumn: Level3C
+
+		annotation SummarizationSetBy = Automatic
+
+	column Level4
+		dataType: double
+		formatString: 0
+		lineageTag: 81704474-7833-4e2b-a326-bd8bb17da5fe
+		summarizeBy: sum
+		sourceColumn: Level4
+
+		annotation SummarizationSetBy = Automatic
+
+	column Total
+		dataType: int64
+		formatString: 0
+		lineageTag: 908f0404-7d17-49c2-af7a-7d3213b2e703
+		summarizeBy: sum
+		sourceColumn: Total
+
+		annotation SummarizationSetBy = Automatic
+
+	partition TCDP = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(FolderPathParameter & "\" & SourceWorkbookNameParameter), null, true),
+				    TCDP_Table = Source{[Item="tbl_TCDP_Headcount",Kind="Table"]}[Data],
+				    #"FilteredRows" = Table.SelectRows(TCDP_Table, each let _month = try Text.Trim(Text.From([MonthStartDate])) otherwise "" in _month <> ""),
+				    ToDate = (value as any) as nullable date =>
+				        let
+				            _directDate = try Date.From(value) otherwise null,
+				            _serial = if _directDate <> null then null else try Number.From(value) otherwise null
+				        in
+				            if _directDate <> null then _directDate else if _serial <> null then Date.AddDays(#date(1899, 12, 30), _serial) else null,
+				    LevelMap = [L1 = "Level1", L3A = "Level3A", L3B = "Level3B", L3C = "Level3C", L4 = "Level4"],
+				    MapValue = (value as any, mapping as record) as nullable text =>
+				        let
+				            _key = if value = null then null else Text.Trim(Text.From(value))
+				        in
+				            if _key = null or _key = "" then null else try Record.Field(mapping, _key) otherwise null,
+				    #"ConvertDate" = Table.TransformColumns(#"FilteredRows", {{"MonthStartDate", ToDate, type date}}),
+				    #"SelectColumns" = Table.SelectColumns(#"ConvertDate", {"MonthStartDate", "TCDPLevelCode", "Headcount"}),
+				    #"AddPivotLevel" = Table.AddColumn(#"SelectColumns", "PivotLevel", each MapValue([TCDPLevelCode], LevelMap), type text),
+				    #"FilteredLevels" = Table.SelectRows(#"AddPivotLevel", each [PivotLevel] <> null),
+				    #"TrimmedColumns" = Table.RemoveColumns(#"FilteredLevels", {"TCDPLevelCode"}),
+				    #"RenamedColumns" = Table.RenameColumns(#"TrimmedColumns", {{"MonthStartDate", "DATE"}}),
+				    #"ChangedType" = Table.TransformColumns(#"RenamedColumns", {{"Headcount", each try Int64.From(_) otherwise null, Int64.Type}}),
+				    #"PivotedTable" = Table.Pivot(#"ChangedType", {"Level1", "Level3A", "Level3B", "Level3C", "Level4"}, "PivotLevel", "Headcount", List.Sum),
+				    #"ReplacedNulls" = Table.ReplaceValue(#"PivotedTable", null, 0, Replacer.ReplaceValue, {"Level1", "Level3A", "Level3B", "Level3C", "Level4"}),
+				    #"TotalAdded" = Table.AddColumn(#"ReplacedNulls", "Total", each [Level1] + [Level3A] + [Level3B] + [Level3C] + [Level4], Int64.Type)
+				in
+				    #"TotalAdded"
+
+	annotation PBI_ResultType = Table
+

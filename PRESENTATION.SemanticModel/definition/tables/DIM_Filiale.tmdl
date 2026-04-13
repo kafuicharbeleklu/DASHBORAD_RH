@@ -1,0 +1,30 @@
+table DIM_Filiale
+	lineageTag: fcd44922-b634-4f58-895f-fd4282bc5ac9
+
+	column FilialeCode
+		dataType: string
+		lineageTag: 75bf7187-a444-4144-87a8-4a41ea4cbb58
+		sourceColumn: FilialeCode
+
+	column FilialeName
+		dataType: string
+		lineageTag: 7869696f-f995-47e4-a2bb-a12cf759df24
+		sourceColumn: FilialeName
+
+	partition DIM_Filiale = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(FolderPathParameter & "\" & SourceWorkbookNameParameter), null, true),
+				    FilialeTable = Source{[Item="tbl_REF_Filiale",Kind="Table"]}[Data],
+				    #"RenamedColumns" = Table.RenameColumns(FilialeTable, {{"REF_Filiale", "FilialeCode"}, {"Label", "FilialeName"}}),
+				    #"ChangedType" = Table.TransformColumnTypes(#"RenamedColumns", {{"FilialeCode", type text}, {"FilialeName", type text}}),
+				    #"TrimmedText" = Table.TransformColumns(#"ChangedType", {{"FilialeCode", each if _ = null then null else Text.Trim(_), type text}, {"FilialeName", each if _ = null then null else Text.Trim(_), type text}}),
+				    #"FilteredRows" = Table.SelectRows(#"TrimmedText", each [FilialeCode] <> null and [FilialeCode] <> ""),
+				    #"DistinctRows" = Table.Distinct(#"FilteredRows"),
+				    #"SortedRows" = Table.Sort(#"DistinctRows", {{"FilialeName", Order.Ascending}, {"FilialeCode", Order.Ascending}})
+				in
+				    #"SortedRows"
+
+	annotation PBI_ResultType = Table
+

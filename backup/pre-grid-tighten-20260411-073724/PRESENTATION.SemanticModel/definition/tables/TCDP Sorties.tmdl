@@ -1,0 +1,132 @@
+table 'TCDP Sorties'
+	lineageTag: 954af3ff-1318-4b98-8c25-245a910ca101
+
+	measure 'TCDP Leaves Count' = COUNTROWS('TCDP Sorties')
+		formatString: 0
+		displayFolder: 'TCDP'
+		lineageTag: 954af3ff-1318-4b98-8c25-245a910ca102
+
+	measure 'TCDP Voluntary Leaves' =
+			CALCULATE(
+				[TCDP Leaves Count],
+				'TCDP Sorties'[LeaveType] = "Voluntary"
+			)
+		formatString: 0
+		displayFolder: 'TCDP'
+		lineageTag: 954af3ff-1318-4b98-8c25-245a910ca103
+
+	measure 'TCDP Voluntary Leaves %' = DIVIDE([TCDP Voluntary Leaves], [TCDP Leaves Count])
+		formatString: 0.0%
+		displayFolder: 'TCDP'
+		lineageTag: 954af3ff-1318-4b98-8c25-245a910ca104
+
+	measure 'TCDP Leaves Level 3C' =
+			CALCULATE(
+				[TCDP Leaves Count],
+				'TCDP Sorties'[Level] = "Level 3C"
+			)
+		formatString: 0
+		displayFolder: 'TCDP'
+		lineageTag: 954af3ff-1318-4b98-8c25-245a910ca105
+
+	measure 'TCDP Leaves Level 4' =
+			CALCULATE(
+				[TCDP Leaves Count],
+				'TCDP Sorties'[Level] = "Level 4"
+			)
+		formatString: 0
+		displayFolder: 'TCDP'
+		lineageTag: 954af3ff-1318-4b98-8c25-245a910ca106
+
+	measure 'TCDP Leaves Level 3C & 4' = [TCDP Leaves Level 3C] + [TCDP Leaves Level 4]
+		formatString: 0
+		displayFolder: 'TCDP'
+		lineageTag: 954af3ff-1318-4b98-8c25-245a910ca10f
+
+	column SortieUserID
+		dataType: string
+		lineageTag: 954af3ff-1318-4b98-8c25-245a910ca107
+		summarizeBy: none
+		sourceColumn: SortieUserID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Nom
+		dataType: string
+		lineageTag: 954af3ff-1318-4b98-8c25-245a910ca108
+		summarizeBy: none
+		sourceColumn: Nom
+
+		annotation SummarizationSetBy = Automatic
+
+	column Prenoms
+		dataType: string
+		lineageTag: 954af3ff-1318-4b98-8c25-245a910ca109
+		summarizeBy: none
+		sourceColumn: Prenoms
+
+		annotation SummarizationSetBy = Automatic
+
+	column Level
+		dataType: string
+		lineageTag: 954af3ff-1318-4b98-8c25-245a910ca10a
+		summarizeBy: none
+		sourceColumn: Level
+
+		annotation SummarizationSetBy = Automatic
+
+	column Mois
+		dataType: string
+		lineageTag: 954af3ff-1318-4b98-8c25-245a910ca10b
+		summarizeBy: none
+		sourceColumn: Mois
+
+		annotation SummarizationSetBy = Automatic
+
+	column MonthOrder
+		dataType: int64
+		formatString: 0
+		lineageTag: 954af3ff-1318-4b98-8c25-245a910ca10c
+		summarizeBy: sum
+		sourceColumn: MonthOrder
+
+		annotation SummarizationSetBy = Automatic
+
+	column Motif
+		dataType: string
+		lineageTag: 954af3ff-1318-4b98-8c25-245a910ca10d
+		summarizeBy: none
+		sourceColumn: Motif
+
+		annotation SummarizationSetBy = Automatic
+
+	column LeaveType
+		dataType: string
+		lineageTag: 954af3ff-1318-4b98-8c25-245a910ca10e
+		summarizeBy: none
+		sourceColumn: LeaveType
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'TCDP Sorties' = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents("P:\PRESENTATION DATA RH\DONNEES RH Decembre 2025 MALI V2.xlsx"), null, true),
+				    TCDP_Sheet = Source{[Item="TCDP",Kind="Sheet"]}[Data],
+				    #"SkipToDetail" = Table.Skip(TCDP_Sheet, 20),
+				    #"SelectColumns" = Table.SelectColumns(#"SkipToDetail", {"Column5", "Column6", "Column7", "Column8", "Column9", "Column12"}),
+				    #"SkipHeaderRow" = Table.Skip(#"SelectColumns", 1),
+				    #"RenameColumns" = Table.RenameColumns(#"SkipHeaderRow", {{"Column5", "SortieUserID"}, {"Column6", "Nom"}, {"Column7", "Prenoms"}, {"Column8", "LevelRaw"}, {"Column9", "Mois"}, {"Column12", "Motif"}}),
+				    #"FillDownMonth" = Table.FillDown(#"RenameColumns", {"Mois"}),
+				    #"FilteredRows" = Table.SelectRows(#"FillDownMonth", each ([Nom] <> null and Text.Trim(Text.From([Nom])) <> "") or ([SortieUserID] <> null and Text.Trim(Text.From([SortieUserID])) <> "")),
+				    #"AddLevel" = Table.AddColumn(#"FilteredRows", "Level", each let _raw = Text.Upper(Text.Trim(Text.From([LevelRaw]))) in if _raw = "N4" or _raw = "4" then "Level 4" else if _raw = "N3C" or _raw = "3C" then "Level 3C" else if _raw = "N3B" or _raw = "3B" then "Level 3B" else if _raw = "N3A" or _raw = "3A" then "Level 3A" else if _raw = "N2C" or _raw = "2C" then "Level 2C" else if _raw = "N2B" or _raw = "2B" then "Level 2B" else if _raw = "N2A" or _raw = "2A" then "Level 2A" else if _raw = "N3" or _raw = "3" then "Level 3" else if _raw = "N2" or _raw = "2" then "Level 2" else if _raw = "N1" or _raw = "1" then "Level 1" else _raw, type text),
+				    #"AddMonthDate" = Table.AddColumn(#"AddLevel", "MonthDate", each Date.FromText("01-" & Text.From([Mois]), [Culture = "fr-FR"]), type date),
+				    #"AddMonthOrder" = Table.AddColumn(#"AddMonthDate", "MonthOrder", each Date.Year([MonthDate]) * 100 + Date.Month([MonthDate]), Int64.Type),
+				    #"AddLeaveType" = Table.AddColumn(#"AddMonthOrder", "LeaveType", each let _motif = Text.Lower(Text.From([Motif])) in if Text.Contains(_motif, "démission") or Text.Contains(_motif, "abandon") then "Voluntary" else "Other", type text),
+				    #"SelectOutput" = Table.SelectColumns(#"AddLeaveType", {"SortieUserID", "Nom", "Prenoms", "Level", "Mois", "MonthOrder", "Motif", "LeaveType"})
+				in
+				    #"SelectOutput"
+
+	annotation PBI_ResultType = Table
+

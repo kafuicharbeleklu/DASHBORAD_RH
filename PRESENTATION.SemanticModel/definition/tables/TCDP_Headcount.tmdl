@@ -1,0 +1,63 @@
+table TCDP_Headcount
+	lineageTag: a175f68e-e8f9-4a12-b891-7258eb5d48f7
+
+	column FilialeCode
+		dataType: string
+		lineageTag: 64862ce3-fe2b-49d2-80a7-129aa7702bd8
+		sourceColumn: FilialeCode
+
+	column FilialeName
+		dataType: string
+		lineageTag: 31cece74-a9fe-48ac-991c-495f1a1b2270
+		sourceColumn: FilialeName
+
+	column MonthStartDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 1486f196-c66a-4f37-b8af-6d120d931838
+		summarizeBy: none
+		sourceColumn: MonthStartDate
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column SourceYear
+		dataType: int64
+		lineageTag: 3f188c7f-dde3-40b9-bb58-6d782d9c88a7
+		summarizeBy: none
+		sourceColumn: SourceYear
+
+	column TCDPLevelCode
+		dataType: string
+		lineageTag: d290fe73-e0fa-489b-b536-50fd1eab08bc
+		sourceColumn: TCDPLevelCode
+
+	column Headcount
+		dataType: int64
+		lineageTag: 2f8b66d2-996a-4f17-851b-e876de85699f
+		sourceColumn: Headcount
+
+	partition TCDP_Headcount = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(FolderPathParameter & "\" & SourceWorkbookNameParameter), null, true),
+				    TCDPTable = Source{[Item="tbl_TCDP_Headcount",Kind="Table"]}[Data],
+				    #"FilteredRows" = Table.SelectRows(TCDPTable, each let _month = try Text.Trim(Text.From([MonthStartDate])) otherwise "" in _month <> ""),
+				    ToDate = (value as any) as nullable date =>
+				        let
+				            DirectDate = try Date.From(value) otherwise null,
+				            Serial = if DirectDate <> null then null else try Number.From(value) otherwise null
+				        in
+				            if DirectDate <> null then DirectDate else if Serial <> null then Date.AddDays(#date(1899, 12, 30), Serial) else null,
+				    #"ConvertDates" = Table.TransformColumns(#"FilteredRows", {{"MonthStartDate", ToDate, type date}}),
+				    TextColumns = {"FilialeCode", "FilialeName", "TCDPLevelCode"},
+				    #"TrimmedText" = Table.TransformColumns(#"ConvertDates", List.Transform(TextColumns, each {_, (v) => if v = null then null else Text.Trim(Text.From(v)), type text})),
+				    #"ChangedTypes" = Table.TransformColumns(#"TrimmedText", {{"SourceYear", each try Int64.From(_) otherwise null, Int64.Type}, {"Headcount", each try Int64.From(_) otherwise null, Int64.Type}}),
+				    #"SelectOutput" = Table.SelectColumns(#"ChangedTypes", {"FilialeCode", "FilialeName", "MonthStartDate", "SourceYear", "TCDPLevelCode", "Headcount"})
+				in
+				    #"SelectOutput"
+
+	annotation PBI_ResultType = Table
+

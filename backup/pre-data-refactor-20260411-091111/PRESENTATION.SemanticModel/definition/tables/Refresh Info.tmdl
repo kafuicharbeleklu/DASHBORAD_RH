@@ -1,0 +1,28 @@
+table 'Refresh Info'
+	isHidden
+	lineageTag: 7e8b4b7f-d4c7-42dc-9440-fc00dc86f6e1
+
+	measure 'Last Refresh Label' =
+			"MAJ " & FORMAT(MAX('Refresh Info'[RefreshedAt]), "dd/MM/yyyy HH:mm")
+		displayFolder: Metadata
+		lineageTag: 8fa83c27-a2d6-4a34-99a4-1b99bbdf70c1
+
+	column RefreshedAt
+		dataType: dateTime
+		isHidden
+		formatString: General Date
+		lineageTag: 460211ae-9468-4765-92ad-8014ef4862ba
+		summarizeBy: none
+		sourceColumn: RefreshedAt
+
+		annotation SummarizationSetBy = User
+
+	partition 'Refresh Info' = m
+		mode: import
+		source =
+				let
+				    Source = #table(type table [RefreshedAt = datetime], {{DateTime.FixedLocalNow()}})
+				in
+				    Source
+
+	annotation PBI_ResultType = Table

@@ -1,0 +1,72 @@
+model Model
+	culture: fr-FR
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: fr-TG
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["FolderPathParameter","SourceWorkbookNameParameter","Absence","Formation","Masse salariale","Recrutement","TCDP","Scenario","HR Date","Refresh Info","TCDP Gender","TCDP Levels","TCDP Sorties","TCDP Level Dim","Effectif","Embauches","Departs","AbsenceMensuelle","FormationMensuelle","RecrutementMensuel","RecrutementDetail","MasseSalarialeMensuelle","TCDP_Headcount","TCDP_Entrees","TCDP_Sorties","TCDP_Genre","DIM_Filiale","DIM_TypeContrat","DIM_StatutGeo","DIM_CatConv","DIM_Sexe","DIM_MotifDepart","DIM_MotifRecruit","DIM_TCDPLevel","DIM_Nationalite","DIM_AbsenceType","DIM_MotifSortieTCDP"]
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table Absence
+ref table Formation
+ref table 'Masse salariale'
+ref table Recrutement
+ref table TCDP
+ref table Scenario
+ref table 'TCDP Gender'
+ref table 'TCDP Levels'
+ref table 'TCDP Sorties'
+ref table 'HR Date'
+ref table 'Refresh Info'
+ref table 'TCDP Level Dim'
+ref table Effectif
+ref table Embauches
+ref table Departs
+ref table AbsenceMensuelle
+ref table FormationMensuelle
+ref table RecrutementMensuel
+ref table RecrutementDetail
+ref table MasseSalarialeMensuelle
+ref table TCDP_Headcount
+ref table TCDP_Entrees
+ref table TCDP_Sorties
+ref table TCDP_Genre
+ref table DIM_Filiale
+ref table DIM_TypeContrat
+ref table DIM_StatutGeo
+ref table DIM_CatConv
+ref table DIM_Sexe
+ref table DIM_MotifDepart
+ref table DIM_MotifRecruit
+ref table DIM_TCDPLevel
+ref table DIM_Nationalite
+ref table DIM_AbsenceType
+ref table DIM_MotifSortieTCDP
+ref table DateTableTemplate_8aac04cd-1b46-451e-82e5-a2ac7fb5744f
+ref table LocalDateTable_da5f79ea-62f9-4e18-b5b3-c6ac330894b9
+ref table LocalDateTable_ebe640fd-74f1-40d4-8980-8dfac4795011
+ref table LocalDateTable_9c46787b-f0e0-4974-a3a3-1b4f1a2d4c23
+ref table LocalDateTable_b12d2768-b4e6-420c-823a-c3683da3aae5
+ref table LocalDateTable_3b66c3d3-1f29-4452-9043-bcb263360977
+ref table LocalDateTable_510882d2-74d9-470e-9173-340bad687ab7
+ref table LocalDateTable_1771491a-6727-4d9e-82ea-ea431f298f79
+ref table LocalDateTable_ec58d15d-8370-47cf-85b7-22119ee7c5ab
+ref table LocalDateTable_8ea25b3c-ef8f-4128-84e3-7c4198f99a16
+ref table LocalDateTable_b6aa15ec-ec3e-4394-98ef-a91216e461e6
+ref table LocalDateTable_f0128898-5f49-48a3-9667-a5b7942e6aa0
+ref table LocalDateTable_11eee727-b4a6-4314-9df0-f95021084081
+ref table LocalDateTable_3e83df3e-a4c5-41f7-9463-84fa9c1e9255
+ref table LocalDateTable_9060ef43-0e3e-40a0-9757-8ff2006fdb78
+ref table LocalDateTable_c07cef49-9a8c-4017-9762-d88a498ce764
+ref table LocalDateTable_e7a0aa49-eb0f-4dcf-b385-3b6905cf571c
+ref table LocalDateTable_e630f364-b61f-4a34-99a8-c7d6b42cdabc
+ref table LocalDateTable_077378e1-1214-4779-be87-d24b52b7ee50
+ref table LocalDateTable_263dc6f0-efd3-470e-9958-01114640daab
+
+ref cultureInfo fr-FR
+

@@ -1,0 +1,6 @@
+expression FolderPathParameter = "C:\Users\eklu\Downloads\111\RH\Lab" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 88d412f0-204c-41b5-bc02-e35e2a84837f
+
+expression SourceWorkbookNameParameter = "RH_Collecte_SIMULATION_2026.xlsx" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: b331a235-2f6b-426a-a681-c06ad58fa1a2
+

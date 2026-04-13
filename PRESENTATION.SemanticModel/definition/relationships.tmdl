@@ -1,0 +1,323 @@
+relationship 1f9c4a01-5f17-46fd-b4d1-7a8d735d3101
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Recrutement.DATE
+	toColumn: 'HR Date'.Date
+
+relationship 1f9c4a01-5f17-46fd-b4d1-7a8d735d3102
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Formation.DATE
+	toColumn: 'HR Date'.Date
+
+relationship 1f9c4a01-5f17-46fd-b4d1-7a8d735d3103
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Absence.DATE
+	toColumn: 'HR Date'.Date
+
+relationship 1f9c4a01-5f17-46fd-b4d1-7a8d735d3104
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Masse salariale'.DATE
+	toColumn: 'HR Date'.Date
+
+relationship 1f9c4a01-5f17-46fd-b4d1-7a8d735d3109
+	fromColumn: 'TCDP Levels'.Level
+	toColumn: 'TCDP Level Dim'.Level
+
+relationship 1f9c4a01-5f17-46fd-b4d1-7a8d735d3110
+	fromColumn: 'TCDP Gender'.Level
+	toColumn: 'TCDP Level Dim'.Level
+
+relationship 1f9c4a01-5f17-46fd-b4d1-7a8d735d3111
+	fromColumn: 'TCDP Sorties'.Level
+	toColumn: 'TCDP Level Dim'.Level
+
+relationship a327e82e-82be-4772-b07f-6844a5d9020f
+	fromColumn: Effectif.FilialeCode
+	toColumn: DIM_Filiale.FilialeCode
+
+relationship 0618bb4e-2520-4c1f-b795-65f27a11e759
+	fromColumn: Embauches.FilialeCode
+	toColumn: DIM_Filiale.FilialeCode
+
+relationship f12d5ff5-2600-4dfb-87c9-46e489a7e9c4
+	fromColumn: Departs.FilialeCode
+	toColumn: DIM_Filiale.FilialeCode
+
+relationship 12020e64-ed1f-4e47-8fe2-37405215422e
+	fromColumn: AbsenceMensuelle.FilialeCode
+	toColumn: DIM_Filiale.FilialeCode
+
+relationship 84759438-5d30-4c2f-b39c-5fb0e87b309c
+	fromColumn: FormationMensuelle.FilialeCode
+	toColumn: DIM_Filiale.FilialeCode
+
+relationship e3d292d5-ed43-4b67-8eec-14609410e04b
+	fromColumn: RecrutementMensuel.FilialeCode
+	toColumn: DIM_Filiale.FilialeCode
+
+relationship 13282dc4-07b8-4564-a153-bb821562c416
+	fromColumn: MasseSalarialeMensuelle.FilialeCode
+	toColumn: DIM_Filiale.FilialeCode
+
+relationship b355c2ef-9d1b-40e7-a1f4-494ce507b9ef
+	fromColumn: TCDP_Headcount.FilialeCode
+	toColumn: DIM_Filiale.FilialeCode
+
+relationship 6b568b36-4e14-457d-ac05-8cdccd51d3ac
+	fromColumn: TCDP_Entrees.FilialeCode
+	toColumn: DIM_Filiale.FilialeCode
+
+relationship 290ddcd4-12df-4c5e-a5bc-6cc0b3d0c031
+	fromColumn: TCDP_Sorties.FilialeCode
+	toColumn: DIM_Filiale.FilialeCode
+
+relationship be39b7bd-ee7e-4a58-8ef1-9e15e66a3784
+	fromColumn: TCDP_Genre.FilialeCode
+	toColumn: DIM_Filiale.FilialeCode
+
+relationship a31ec2a7-4fa7-4316-8c19-623efe2eacfc
+	fromColumn: RecrutementDetail.FilialeCode
+	toColumn: DIM_Filiale.FilialeCode
+
+relationship 2d06d7fd-0f14-4273-842c-17c7a53de86b
+	fromColumn: Effectif.TypeContratCode
+	toColumn: DIM_TypeContrat.REF_TypeContrat
+
+relationship d74d5726-bded-4497-9962-ba615505afdb
+	fromColumn: Embauches.TypeContratCode
+	toColumn: DIM_TypeContrat.REF_TypeContrat
+
+relationship 3f1060a9-f10f-48fc-b500-4dde8c314e42
+	fromColumn: Departs.TypeContratCode
+	toColumn: DIM_TypeContrat.REF_TypeContrat
+
+relationship 0458eb18-6e04-4e89-8d8b-a761e43bd933
+	fromColumn: Effectif.StatutGeoCode
+	toColumn: DIM_StatutGeo.REF_StatutGeo
+
+relationship 0b97f912-6535-47b4-99ad-015a79d90b8c
+	fromColumn: Embauches.StatutGeoCode
+	toColumn: DIM_StatutGeo.REF_StatutGeo
+
+relationship 937aaf22-e480-411b-a37f-10c3214bf6d9
+	fromColumn: Effectif.CategorieConventionnelleCode
+	toColumn: DIM_CatConv.REF_CatConv
+
+relationship 4d3e4da0-1fd4-4d4c-9d8d-4dcb06a0c101
+	fromColumn: Embauches.CategorieConventionnelleCode
+	toColumn: DIM_CatConv.REF_CatConv
+
+relationship dbf70ffa-e562-4b67-b36a-217b90c31f5c
+	fromColumn: Effectif.SexeCode
+	toColumn: DIM_Sexe.REF_Sexe
+
+relationship 46b7cf1c-1c65-4208-b003-e00706febe32
+	fromColumn: Embauches.SexeCode
+	toColumn: DIM_Sexe.REF_Sexe
+
+relationship 83f3141d-76a6-42cf-99c0-7f7af956fa23
+	fromColumn: Departs.SexeCode
+	toColumn: DIM_Sexe.REF_Sexe
+
+relationship f1fd43b4-5c14-4b42-8973-d8c143adf970
+	fromColumn: Departs.MotifDepartCode
+	toColumn: DIM_MotifDepart.REF_MotifDepart
+
+relationship 95c0293e-7865-4a72-b5bd-571cb368a7e5
+	fromColumn: Embauches.MotifRecrutementCode
+	toColumn: DIM_MotifRecruit.REF_MotifRecruit
+
+relationship e7af9080-3ae2-4ea1-94b9-a5e418eab898
+	fromColumn: RecrutementDetail.MotifRecrutementCode
+	toColumn: DIM_MotifRecruit.REF_MotifRecruit
+
+relationship 71c19520-aa01-4a06-9bb9-c607816193b5
+	fromColumn: TCDP_Headcount.TCDPLevelCode
+	toColumn: DIM_TCDPLevel.REF_TCDPLevel
+
+relationship 36721393-4324-4d23-bbb9-21bb9e6d760c
+	fromColumn: TCDP_Entrees.TCDPLevelCode
+	toColumn: DIM_TCDPLevel.REF_TCDPLevel
+
+relationship e44782b4-7d9b-4d60-96cf-6b65ec9b8fb1
+	fromColumn: TCDP_Sorties.TCDPLevelCode
+	toColumn: DIM_TCDPLevel.REF_TCDPLevel
+
+relationship 7bb3087d-0d74-4cf1-9495-0a2cddfe17ad
+	fromColumn: TCDP_Genre.TCDPLevelCode
+	toColumn: DIM_TCDPLevel.REF_TCDPLevel
+
+relationship db0966e5-aaa0-4d3f-9956-8de3aacf22a8
+	fromColumn: Effectif.NationaliteCode
+	toColumn: DIM_Nationalite.REF_Nationalite
+
+relationship e3e31317-0ea4-466f-9fc9-27d0d7c37d73
+	fromColumn: Embauches.NationaliteCode
+	toColumn: DIM_Nationalite.REF_Nationalite
+
+relationship d7ad11aa-22b2-4af1-940a-b0af41c0f2ee
+	fromColumn: Departs.NationaliteCode
+	toColumn: DIM_Nationalite.REF_Nationalite
+
+relationship f03fc138-c133-4466-b94f-7348effcac19
+	fromColumn: AbsenceMensuelle.AbsenceTypeCode
+	toColumn: DIM_AbsenceType.REF_AbsenceType
+
+relationship 15f65817-538e-49fb-80f7-46ea27e874ea
+	fromColumn: TCDP_Sorties.TCDPExitReasonCode
+	toColumn: DIM_MotifSortieTCDP.REF_MotifSortieTCDP
+
+relationship 183de1aa-2c89-4e26-a8c4-75fd18c11d44
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Effectif.SnapshotDate
+	toColumn: 'HR Date'.Date
+
+relationship 3a0e9bb7-4851-4ec3-a2ad-43b74d1021d9
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Embauches.EventDate
+	toColumn: 'HR Date'.Date
+
+relationship 5fd4f8a1-61ea-4958-b2a3-e4e32295d201
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Departs.EventDate
+	toColumn: 'HR Date'.Date
+
+relationship 6c9f29d8-252d-4af4-ad28-2a35b65032a5
+	joinOnDateBehavior: datePartOnly
+	fromColumn: AbsenceMensuelle.MonthStartDate
+	toColumn: 'HR Date'.Date
+
+relationship b4cfdf83-93df-4e3c-a6ce-5310f3a11036
+	joinOnDateBehavior: datePartOnly
+	fromColumn: FormationMensuelle.MonthStartDate
+	toColumn: 'HR Date'.Date
+
+relationship 0270d647-9dbc-471c-93d2-e539d9cad368
+	joinOnDateBehavior: datePartOnly
+	fromColumn: RecrutementMensuel.MonthStartDate
+	toColumn: 'HR Date'.Date
+
+relationship 71bd00bc-46bb-487d-9bd8-3a8adf09af55
+	joinOnDateBehavior: datePartOnly
+	fromColumn: RecrutementDetail.MonthStartDate
+	toColumn: 'HR Date'.Date
+
+relationship 94dfa088-026a-47af-9e24-1a1efa91d08c
+	joinOnDateBehavior: datePartOnly
+	fromColumn: MasseSalarialeMensuelle.MonthStartDate
+	toColumn: 'HR Date'.Date
+
+relationship 8b88571f-f436-43b2-a5a5-c31646d5ac0d
+	joinOnDateBehavior: datePartOnly
+	fromColumn: TCDP_Headcount.MonthStartDate
+	toColumn: 'HR Date'.Date
+
+relationship b9e457bf-6b27-49f1-9c5c-4a6c32c8624f
+	joinOnDateBehavior: datePartOnly
+	fromColumn: TCDP_Entrees.EventDate
+	toColumn: 'HR Date'.Date
+
+relationship c2cdb40b-5d08-4ff8-9e2b-d6526d76be33
+	joinOnDateBehavior: datePartOnly
+	fromColumn: TCDP_Sorties.EventDate
+	toColumn: 'HR Date'.Date
+
+relationship e8f1a708-c090-41e6-9f55-5579b7cc9cb0
+	joinOnDateBehavior: datePartOnly
+	fromColumn: TCDP_Genre.MonthStartDate
+	toColumn: 'HR Date'.Date
+
+relationship 5f112eb6-f0a4-4e54-bd4f-f8a035cbde48
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Effectif.DateNaissance
+	toColumn: LocalDateTable_da5f79ea-62f9-4e18-b5b3-c6ac330894b9.Date
+
+relationship d9ad2b12-ea74-4f63-b825-847f4c26734f
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Effectif.DateEmbauche
+	toColumn: LocalDateTable_ebe640fd-74f1-40d4-8980-8dfac4795011.Date
+
+relationship dce3d803-27d9-420c-87fe-f2d337f3915b
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Effectif.DateEntree
+	toColumn: LocalDateTable_9c46787b-f0e0-4974-a3a3-1b4f1a2d4c23.Date
+
+relationship 8759aceb-0c36-4b03-857f-6eb455f7d6e2
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Effectif.DateFinContrat
+	toColumn: LocalDateTable_b12d2768-b4e6-420c-823a-c3683da3aae5.Date
+
+relationship fedf1cfd-6f1f-4254-8d11-04565797ffb0
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Embauches.MonthStartDate
+	toColumn: LocalDateTable_3b66c3d3-1f29-4452-9043-bcb263360977.Date
+
+relationship e3d13400-9ce3-4491-8b34-94a05f6fe114
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Embauches.DateNaissance
+	toColumn: LocalDateTable_510882d2-74d9-470e-9173-340bad687ab7.Date
+
+relationship 086f8310-3376-49fe-8fa1-3338fa73aad7
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Embauches.DateEmbauche
+	toColumn: LocalDateTable_1771491a-6727-4d9e-82ea-ea431f298f79.Date
+
+relationship a749a049-cabe-4598-9c2e-52f2c424437e
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Embauches.DateEntree
+	toColumn: LocalDateTable_ec58d15d-8370-47cf-85b7-22119ee7c5ab.Date
+
+relationship 5cb7ac89-df31-4589-a94c-b94d1b589083
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Embauches.DateFinContrat
+	toColumn: LocalDateTable_8ea25b3c-ef8f-4128-84e3-7c4198f99a16.Date
+
+relationship 4cf30434-0432-4bd7-b551-48cf5c70cabc
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Departs.MonthStartDate
+	toColumn: LocalDateTable_b6aa15ec-ec3e-4394-98ef-a91216e461e6.Date
+
+relationship 7994aad1-49f6-45be-b7f3-ea09b06e85d7
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Departs.DateNaissance
+	toColumn: LocalDateTable_f0128898-5f49-48a3-9667-a5b7942e6aa0.Date
+
+relationship 804b3d43-c884-4b8d-9583-c30a7d926cff
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Departs.DateEmbauche
+	toColumn: LocalDateTable_11eee727-b4a6-4314-9df0-f95021084081.Date
+
+relationship b695656f-91a6-4892-beab-86df59023bb9
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Departs.DateEntree
+	toColumn: LocalDateTable_3e83df3e-a4c5-41f7-9463-84fa9c1e9255.Date
+
+relationship 15cff1a0-9c34-4543-9f41-1de1b1b1ebc8
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Departs.DateDepart
+	toColumn: LocalDateTable_9060ef43-0e3e-40a0-9757-8ff2006fdb78.Date
+
+relationship ed26e7c9-357c-40ca-bd16-41a0d9c03494
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Departs.DateFinContrat
+	toColumn: LocalDateTable_c07cef49-9a8c-4017-9762-d88a498ce764.Date
+
+relationship 698ba696-b1f3-47ab-b850-b0e88f18b195
+	joinOnDateBehavior: datePartOnly
+	fromColumn: RecrutementDetail.PlannedRecruitmentDate
+	toColumn: LocalDateTable_e7a0aa49-eb0f-4dcf-b385-3b6905cf571c.Date
+
+relationship 53168e7c-99f1-40db-bea7-58420b65a46b
+	joinOnDateBehavior: datePartOnly
+	fromColumn: RecrutementDetail.EffectiveEntryDate
+	toColumn: LocalDateTable_e630f364-b61f-4a34-99a8-c7d6b42cdabc.Date
+
+relationship 36d86e67-6954-4ce0-b748-9c3e2376882f
+	joinOnDateBehavior: datePartOnly
+	fromColumn: TCDP_Entrees.MonthStartDate
+	toColumn: LocalDateTable_077378e1-1214-4779-be87-d24b52b7ee50.Date
+
+relationship 24c6fa14-93a4-4cd6-8089-359402dee689
+	joinOnDateBehavior: datePartOnly
+	fromColumn: TCDP_Sorties.MonthStartDate
+	toColumn: LocalDateTable_263dc6f0-efd3-470e-9958-01114640daab.Date
+

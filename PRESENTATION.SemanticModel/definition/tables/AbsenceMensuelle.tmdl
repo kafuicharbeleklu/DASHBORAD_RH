@@ -1,0 +1,93 @@
+table AbsenceMensuelle
+	lineageTag: cafd949d-733b-4ff9-a2b3-ddefdc2d4313
+
+	measure AbsenceRate =
+			DIVIDE(
+				SUM(AbsenceMensuelle[AbsenceHours]),
+				SUM(Effectif[_EffectifsActifs]) * 8 * 21,
+				0
+			)
+		formatString: 0.0%
+		displayFolder: 'HR Performance\Absence'
+		lineageTag: 5bae9958-fc26-43cf-aa38-f6503846263a
+
+	column FilialeCode
+		dataType: string
+		lineageTag: c4aefc87-f81c-4cac-98a3-db8e8ef85ba7
+		sourceColumn: FilialeCode
+
+	column FilialeName
+		dataType: string
+		lineageTag: 17b26b13-8e7c-446d-8f74-ba6a7baeab1c
+		sourceColumn: FilialeName
+
+	column MonthStartDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 49894fcd-3bb9-4ca0-8c34-c50b3dd026b8
+		summarizeBy: none
+		sourceColumn: MonthStartDate
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column SourceYear
+		dataType: int64
+		lineageTag: db945858-83b6-4a2d-87c9-dbe48ccb1137
+		summarizeBy: none
+		sourceColumn: SourceYear
+
+	column OpeningLeaveDays
+		dataType: double
+		lineageTag: e987979b-b4ab-4874-a74a-32b764967472
+		sourceColumn: OpeningLeaveDays
+
+	column LeaveDaysTaken
+		dataType: double
+		lineageTag: 935e070e-ccaa-4a85-831c-78932417590f
+		sourceColumn: LeaveDaysTaken
+
+	column LeaveDaysAccrued
+		dataType: double
+		lineageTag: 66ad39ac-611b-42c6-acb1-1c66b493e103
+		sourceColumn: LeaveDaysAccrued
+
+	column ClosingLeaveDays
+		dataType: double
+		lineageTag: 94deb62d-320b-488d-a6b2-486b4c527e5a
+		sourceColumn: ClosingLeaveDays
+
+	column AbsenceHours
+		dataType: int64
+		lineageTag: 2cbb0d84-2a54-400f-bd02-1083584a14c3
+		sourceColumn: AbsenceHours
+
+	column AbsenceTypeCode
+		dataType: string
+		lineageTag: 79d8646d-c7a7-4780-b48a-9edb4c36249d
+		sourceColumn: AbsenceTypeCode
+
+	partition AbsenceMensuelle = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(FolderPathParameter & "\" & SourceWorkbookNameParameter), null, true),
+				    AbsenceTable = Source{[Item="tbl_AbsenceMensuelle",Kind="Table"]}[Data],
+				    #"FilteredRows" = Table.SelectRows(AbsenceTable, each let _month = try Text.Trim(Text.From([MonthStartDate])) otherwise "" in _month <> ""),
+				    ToDate = (value as any) as nullable date =>
+				        let
+				            DirectDate = try Date.From(value) otherwise null,
+				            Serial = if DirectDate <> null then null else try Number.From(value) otherwise null
+				        in
+				            if DirectDate <> null then DirectDate else if Serial <> null then Date.AddDays(#date(1899, 12, 30), Serial) else null,
+				    #"ConvertDates" = Table.TransformColumns(#"FilteredRows", {{"MonthStartDate", ToDate, type date}}),
+				    TextColumns = {"FilialeCode", "FilialeName", "AbsenceTypeCode"},
+				    #"TrimmedText" = Table.TransformColumns(#"ConvertDates", List.Transform(TextColumns, each {_, (v) => if v = null then null else Text.Trim(Text.From(v)), type text})),
+				    #"ChangedTypes" = Table.TransformColumns(#"TrimmedText", {{"SourceYear", each try Int64.From(_) otherwise null, Int64.Type}, {"OpeningLeaveDays", each try Number.From(_) otherwise null, type number}, {"LeaveDaysTaken", each try Number.From(_) otherwise null, type number}, {"LeaveDaysAccrued", each try Number.From(_) otherwise null, type number}, {"ClosingLeaveDays", each try Number.From(_) otherwise null, type number}, {"AbsenceHours", each try Int64.From(_) otherwise null, Int64.Type}}),
+				    #"SelectOutput" = Table.SelectColumns(#"ChangedTypes", {"FilialeCode", "FilialeName", "MonthStartDate", "SourceYear", "OpeningLeaveDays", "LeaveDaysTaken", "LeaveDaysAccrued", "ClosingLeaveDays", "AbsenceHours", "AbsenceTypeCode"})
+				in
+				    #"SelectOutput"
+
+	annotation PBI_ResultType = Table
+

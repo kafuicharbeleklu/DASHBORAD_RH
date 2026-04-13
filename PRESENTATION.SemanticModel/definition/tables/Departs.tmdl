@@ -1,0 +1,349 @@
+table Departs
+	lineageTag: 9b861758-016f-4909-9217-47d5c9b9364c
+
+	measure 'Departures Count' =
+			VAR DepartureCount =
+				COUNTROWS(
+					FILTER(
+						Departs,
+						NOT ISBLANK(COALESCE(Departs[DateDepart], Departs[EventDate]))
+					)
+				)
+			RETURN COALESCE(DepartureCount, 0)
+		formatString: 0
+		displayFolder: 'Overview\Attrition'
+		lineageTag: 1a23a795-b57e-4fc8-9d6a-89bbc0456925
+
+	measure 'Voluntary Leaves' =
+			CALCULATE(
+				[Departures Count],
+				FILTER(
+					Departs,
+					VAR ReasonCode = UPPER(TRIM(COALESCE(Departs[MotifDepartCode], "")))
+					RETURN ReasonCode IN {"DEMISSION", "ABANDON", "ABANDON_POSTE"}
+				)
+			)
+		formatString: 0
+		displayFolder: 'Overview\Attrition'
+		lineageTag: e525561f-c219-483a-9e15-d62f63b50a00
+
+	measure 'Voluntary Leave Rate' = DIVIDE([Voluntary Leaves], [Departures Count], 0)
+		formatString: 0.0%
+		displayFolder: 'Overview\Attrition'
+		lineageTag: 6e2a6af0-9bc7-4760-9fe8-6ba6711f4a20
+
+	column FilialeCode
+		dataType: string
+		lineageTag: 6848ba8b-e47b-4cb2-9114-5459b3102061
+		summarizeBy: none
+		sourceColumn: FilialeCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column FilialeName
+		dataType: string
+		lineageTag: 9ff1593e-9f35-47c1-a891-457b0033e51e
+		summarizeBy: none
+		sourceColumn: FilialeName
+
+		annotation SummarizationSetBy = Automatic
+
+	column EventDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 2079d7e6-56a4-41d2-81ec-46cb00b42e9a
+		summarizeBy: none
+		sourceColumn: EventDate
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column MonthStartDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: ebd9be33-da08-4c3a-aab8-f6de0591c6e1
+		summarizeBy: none
+		sourceColumn: MonthStartDate
+
+		variation Variation
+			isDefault
+			relationship: 4cf30434-0432-4bd7-b551-48cf5c70cabc
+			defaultHierarchy: LocalDateTable_b6aa15ec-ec3e-4394-98ef-a91216e461e6.'Hiérarchie de dates'
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column SourceYear
+		dataType: int64
+		lineageTag: 79e9b089-717a-447b-b918-25b3188d404c
+		summarizeBy: sum
+		sourceColumn: SourceYear
+
+		annotation SummarizationSetBy = Automatic
+
+	column Matricule
+		dataType: string
+		lineageTag: 33793e81-ecf2-416f-9d9f-c24503b7d9e4
+		summarizeBy: none
+		sourceColumn: Matricule
+
+		annotation SummarizationSetBy = Automatic
+
+	column EmployeeKey
+		dataType: string
+		lineageTag: 31e7aebb-6dbb-4177-8c81-d391f90e6f5e
+		summarizeBy: none
+		sourceColumn: EmployeeKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column UserID
+		dataType: int64
+		lineageTag: 70a0100e-b7b1-45f7-b1da-5ce6dd145e85
+		summarizeBy: count
+		sourceColumn: UserID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Nom
+		dataType: string
+		lineageTag: 2cd8a8c9-fab0-4b04-b08e-17942bc2faa6
+		summarizeBy: none
+		sourceColumn: Nom
+
+		annotation SummarizationSetBy = Automatic
+
+	column Prenom
+		dataType: string
+		lineageTag: 1f60f95e-cd2d-4a86-bcde-5d22d3555ada
+		summarizeBy: none
+		sourceColumn: Prenom
+
+		annotation SummarizationSetBy = Automatic
+
+	column SexeCode
+		dataType: string
+		lineageTag: 453ce3bc-a9ee-4b9f-932e-66a1adde5038
+		summarizeBy: none
+		sourceColumn: SexeCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column DateNaissance
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 75cb7dcc-d8bc-4f86-bbeb-ea03c510a21e
+		summarizeBy: none
+		sourceColumn: DateNaissance
+
+		variation Variation
+			isDefault
+			relationship: 7994aad1-49f6-45be-b7f3-ea09b06e85d7
+			defaultHierarchy: LocalDateTable_f0128898-5f49-48a3-9667-a5b7942e6aa0.'Hiérarchie de dates'
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column DateEmbauche
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 9fc0da7b-688f-474a-b47a-4aa631ff1a1d
+		summarizeBy: none
+		sourceColumn: DateEmbauche
+
+		variation Variation
+			isDefault
+			relationship: 804b3d43-c884-4b8d-9583-c30a7d926cff
+			defaultHierarchy: LocalDateTable_11eee727-b4a6-4314-9df0-f95021084081.'Hiérarchie de dates'
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column DateEntree
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 34bd5d33-eac6-42a6-b62b-578e8d10d694
+		summarizeBy: none
+		sourceColumn: DateEntree
+
+		variation Variation
+			isDefault
+			relationship: b695656f-91a6-4892-beab-86df59023bb9
+			defaultHierarchy: LocalDateTable_3e83df3e-a4c5-41f7-9463-84fa9c1e9255.'Hiérarchie de dates'
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column DateDepart
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: e3b193a2-e8b8-42df-8121-b02148ca9d31
+		summarizeBy: none
+		sourceColumn: DateDepart
+
+		variation Variation
+			isDefault
+			relationship: 15cff1a0-9c34-4543-9f41-1de1b1b1ebc8
+			defaultHierarchy: LocalDateTable_9060ef43-0e3e-40a0-9757-8ff2006fdb78.'Hiérarchie de dates'
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column MotifDepartCode
+		dataType: string
+		lineageTag: 53dfb165-1087-4d38-82f9-df49130df088
+		summarizeBy: none
+		sourceColumn: MotifDepartCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column PaysMobilite
+		dataType: string
+		lineageTag: d159efea-34e8-401b-9442-7d76f961502b
+		summarizeBy: none
+		sourceColumn: PaysMobilite
+
+		annotation SummarizationSetBy = Automatic
+
+	column Direction
+		dataType: string
+		lineageTag: 56629e11-a612-41b5-93e2-2ee5fd4ec2ac
+		summarizeBy: none
+		sourceColumn: Direction
+
+		annotation SummarizationSetBy = Automatic
+
+	column Departement
+		dataType: string
+		lineageTag: 2ce43889-08f4-4b83-a51f-f046bbd8da10
+		summarizeBy: none
+		sourceColumn: Departement
+
+		annotation SummarizationSetBy = Automatic
+
+	column Service
+		dataType: string
+		lineageTag: e8a28c9c-77f2-41d4-acc0-38d4b73738a2
+		summarizeBy: none
+		sourceColumn: Service
+
+		annotation SummarizationSetBy = Automatic
+
+	column PosteHarmonise
+		dataType: string
+		lineageTag: f423f437-ffd2-43a4-98db-1385a1cbb747
+		summarizeBy: none
+		sourceColumn: PosteHarmonise
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fonction
+		dataType: string
+		lineageTag: ce4c4750-f2ea-481c-9fd5-04341698276b
+		summarizeBy: none
+		sourceColumn: Fonction
+
+		annotation SummarizationSetBy = Automatic
+
+	column CodeAnalytique
+		dataType: string
+		lineageTag: 240c3e36-465a-4793-92a4-7e0129a1ad8a
+		summarizeBy: none
+		sourceColumn: CodeAnalytique
+
+		annotation SummarizationSetBy = Automatic
+
+	column AffectationAnalytique
+		dataType: string
+		lineageTag: 7e835517-ccf8-47a3-b5ad-0b6872fa35a2
+		summarizeBy: none
+		sourceColumn: AffectationAnalytique
+
+		annotation SummarizationSetBy = Automatic
+
+	column CategorieConventionnelleCode
+		dataType: string
+		lineageTag: 9f29886b-ca54-47c4-80eb-acddca94932e
+		summarizeBy: none
+		sourceColumn: CategorieConventionnelleCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column TypeContratCode
+		dataType: string
+		lineageTag: 0942a3e8-ceae-4ae6-8e20-7bb001f3257f
+		summarizeBy: none
+		sourceColumn: TypeContratCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column DateFinContrat
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 7ac3d25b-5968-4cfe-9229-dd8e30c08aaf
+		summarizeBy: none
+		sourceColumn: DateFinContrat
+
+		variation Variation
+			isDefault
+			relationship: ed26e7c9-357c-40ca-bd16-41a0d9c03494
+			defaultHierarchy: LocalDateTable_c07cef49-9a8c-4017-9762-d88a498ce764.'Hiérarchie de dates'
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column StatutGeoCode
+		dataType: string
+		lineageTag: a48fe4bf-2d28-4532-8ab5-445120346ea0
+		summarizeBy: none
+		sourceColumn: StatutGeoCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column NationaliteCode
+		dataType: string
+		lineageTag: a52f8183-c31b-4bef-ab54-8bd20bc9254f
+		summarizeBy: none
+		sourceColumn: NationaliteCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column NiveauTCDPCode
+		dataType: string
+		lineageTag: 68eee0db-7137-4d1b-9ba2-c523247fd052
+		summarizeBy: none
+		sourceColumn: NiveauTCDPCode
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Departs = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(FolderPathParameter & "\" & SourceWorkbookNameParameter), null, true),
+				    DepartsTable = Source{[Item="tbl_Departs",Kind="Table"]}[Data],
+				    #"FilteredRows" = Table.SelectRows(DepartsTable, each let _userId = try Text.Trim(Text.From([UserID])) otherwise "" in _userId <> ""),
+				    ToDate = (value as any) as nullable date =>
+				        let
+				            DirectDate = try Date.From(value) otherwise null,
+				            Serial = if DirectDate <> null then null else try Number.From(value) otherwise null
+				        in
+				            if DirectDate <> null then DirectDate else if Serial <> null then Date.AddDays(#date(1899, 12, 30), Serial) else null,
+				    #"ConvertDates" = Table.TransformColumns(#"FilteredRows", {{"EventDate", ToDate, type date}, {"MonthStartDate", ToDate, type date}, {"DateNaissance", ToDate, type date}, {"DateEmbauche", ToDate, type date}, {"DateEntree", ToDate, type date}, {"DateDepart", ToDate, type date}, {"DateFinContrat", ToDate, type date}}),
+				    TextColumns = {"FilialeCode", "FilialeName", "Matricule", "Nom", "Prenom", "SexeCode", "MotifDepartCode", "PaysMobilite", "Direction", "Departement", "Service", "PosteHarmonise", "Fonction", "CodeAnalytique", "AffectationAnalytique", "CategorieConventionnelleCode", "TypeContratCode", "StatutGeoCode", "NationaliteCode", "NiveauTCDPCode"},
+				    #"TrimmedText" = Table.TransformColumns(#"ConvertDates", List.Transform(TextColumns, each {_, (v) => if v = null then null else Text.Trim(Text.From(v)), type text})),
+				    #"ChangedNumericTypes" = Table.TransformColumns(#"TrimmedText", {{"SourceYear", each try Int64.From(_) otherwise null, Int64.Type}, {"UserID", each try Int64.From(_) otherwise null, Int64.Type}}),
+				    #"AddEmployeeKey" = Table.AddColumn(#"ChangedNumericTypes", "EmployeeKey", each if [FilialeCode] = null or [Matricule] = null or [Matricule] = "" then null else [FilialeCode] & "_" & [Matricule], type text),
+				    #"SelectOutput" = Table.SelectColumns(#"AddEmployeeKey", {"FilialeCode", "FilialeName", "EventDate", "MonthStartDate", "SourceYear", "Matricule", "EmployeeKey", "UserID", "Nom", "Prenom", "SexeCode", "DateNaissance", "DateEmbauche", "DateEntree", "DateDepart", "MotifDepartCode", "PaysMobilite", "Direction", "Departement", "Service", "PosteHarmonise", "Fonction", "CodeAnalytique", "AffectationAnalytique", "CategorieConventionnelleCode", "TypeContratCode", "DateFinContrat", "StatutGeoCode", "NationaliteCode", "NiveauTCDPCode"})
+				in
+				    #"SelectOutput"
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,31 @@
+table 'HR Status'
+	lineageTag: 4cf2a1e9-ea32-4744-96cb-0a8c4a6b8221
+
+	column 'Employment Status'
+		dataType: string
+		lineageTag: 4cf2a1e9-ea32-4744-96cb-0a8c4a6b8222
+		summarizeBy: none
+		sourceColumn: "Employment Status"
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'HR Status' = m
+		mode: import
+		source =
+				let
+				    Source = Table.Combine(
+				        {
+				            Table.SelectColumns(#"Liste de présence au 01-12-2025", {"Statut Local ou Expatrié?"}),
+				            Table.SelectColumns(Départ, {"Statut Local ou Expatrié?"})
+				        }
+				    ),
+				    #"RenamedColumns" = Table.RenameColumns(Source, {{"Statut Local ou Expatrié?", "Employment Status"}}),
+				    #"ChangedType" = Table.TransformColumnTypes(#"RenamedColumns", {{"Employment Status", type text}}),
+				    #"TrimmedText" = Table.TransformColumns(#"ChangedType", {{"Employment Status", each if _ = null then null else Text.Trim(_), type text}}),
+				    #"FilteredRows" = Table.SelectRows(#"TrimmedText", each [Employment Status] <> null and [Employment Status] <> ""),
+				    #"DistinctRows" = Table.Distinct(#"FilteredRows"),
+				    #"SortedRows" = Table.Sort(#"DistinctRows", {{"Employment Status", Order.Ascending}})
+				in
+				    #"SortedRows"
+
+	annotation PBI_ResultType = Table
